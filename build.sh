@@ -1,6 +1,6 @@
 #!/bin/bash
 
-
+# WIP
 
 g++ -lsfml-graphics -lsfml-window -lsfml-system src/main.cpp -c -o bin/main.o
 g++ -lsfml-graphics -lsfml-window -lsfml-system src/licence.cpp -c -o bin/licence.o

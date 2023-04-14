@@ -47,7 +47,8 @@ void MainClass::startGUIProgram(){
   if(!ubuntuFont.loadFromFile("fonts/UbuntuMono-Regular.ttf"))
     std::cout << "fornt error\n";
 
-
+  //how much have we zoomed
+  double ZoomFactor=1;
 
   while (window.isOpen()){
     sf::Event event;
@@ -62,7 +63,13 @@ void MainClass::startGUIProgram(){
             break;
        
           case sf::Event::MouseWheelMoved:
-            //zoom;
+            //==ZOOM
+            {
+              double zoomAddition=1-1.0*event.mouseWheel.delta/10;
+              ZoomFactor*=zoomAddition;
+              mapView.zoom(zoomAddition);
+            }
+          
             break;
           case sf::Event::KeyReleased:
             // sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)
@@ -70,7 +77,7 @@ void MainClass::startGUIProgram(){
           case sf::Event::MouseButtonReleased:
           
             if(event.mouseButton.button==sf::Mouse::Left){
-              //take the mouse coords relative to the window and convert them to the window coords (with all the shifting and scaling)
+              //take the mouse coords relative to the window and convert them to the window coords (with all the shifting and NOT scaling)
               sf::Vector2f pos=window.mapPixelToCoords(sf::Mouse::getPosition(window), mapView);
               Node newNode(pos.x-50, pos.y-25, 100, 50);
               nodes.push_back(newNode);
@@ -90,17 +97,15 @@ void MainClass::startGUIProgram(){
             }
             break;
           case sf::Event::MouseMoved:
-
+          //==PAN
             static sf::Vector2i oldPos;
             
             if(sf::Mouse::isButtonPressed(sf::Mouse::Middle)){
           
               sf::Vector2i pos=sf::Mouse::getPosition(window);
-              int x=oldPos.x-pos.x;
-              int y=oldPos.y-pos.y;
-              mapView.move(x, y);
-              window.setView(mapView);
-              oldPos = pos;
+              sf::Vector2i shift=oldPos-pos;
+              mapView.move(shift.x*ZoomFactor, shift.y*ZoomFactor);
+              oldPos=pos;
             }else{
           
               oldPos=sf::Mouse::getPosition(window);
