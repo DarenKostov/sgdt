@@ -7,14 +7,17 @@
   
 */
 
-
+// #include <SFML/Window.hpp>
+#include <SFML/Graphics.hpp>
+#include "structures/node.h"
+#include <vector>
 
 class MainClass{
 
   private:
     //variables:
+    std::vector<Node> nodes;
 
-    
     
   public:
 

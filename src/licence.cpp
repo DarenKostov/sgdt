@@ -2,11 +2,11 @@
   Daren Kostov
   possibly the worst way to store and print the licence
 
-  steps to replicate thism given you have a GPLv3 licence file:
+  steps to replicate this given you have a GPLv3 licence file:
   sed -i 's/"/\\"/g' licence.cpp
   sed -i 's/$/\\n";/' licence.cpp
   sed -i 's/^/std::cout << "/' licence.cpp
-  (add all of this into a function or something, in this case I added into printLicence)
+  (add the resulting file into a function or something, in this case I added into printLicence)
 
 */
 
