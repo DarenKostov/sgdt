@@ -51,6 +51,10 @@ int Node::getH(){
   return Height;
 }
 
+void Node::updatePreviousCoordinates(){
+  prevXCoordinate=XCoordinate;
+  prevYCoordinate=YCoordinate;
+}
 
 
 void Node::setX(int in){

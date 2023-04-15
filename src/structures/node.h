@@ -28,8 +28,11 @@ class Node{
 
   public:
 
+
+    //previous cooredinates
     int prevXCoordinate;
     int prevYCoordinate;
+    void updatePreviousCoordinates();
 
     //constructor with X, Y, W, and H (and font)
     Node(int, int, int, int, sf::Font&);
@@ -57,7 +60,7 @@ class Node{
     
     //tells you weather or not the box is colliding with these coords
     bool collidingWithCoords(int, int);
-  
+
 
   
 };

@@ -143,12 +143,10 @@ void MainClass::startGUIProgram(){
             //=Manage the selection
             if(event.mouseButton.button==sf::Mouse::Left){
               sf::Vector2f mousePos=window.mapPixelToCoords(sf::Mouse::getPosition(window), mapView);
+            
+            
               manageSelection(mousePos);
               
-              for(auto selectedNode : selectedNodes){
-                selectedNode->prevXCoordinate=selectedNode->getX();
-                selectedNode->prevYCoordinate=selectedNode->getY();
-              }
             }
                         
             break;
@@ -196,6 +194,9 @@ void MainClass::startGUIProgram(){
 
               oldPos=window.mapPixelToCoords(sf::Mouse::getPosition(window), mapView);
               oldPosMapView=mapView.getCenter();
+              for(auto node : nodes){
+                node->updatePreviousCoordinates();
+              }
             }
 
           
@@ -253,7 +254,6 @@ void MainClass::startGUIProgram(){
 
     stats.setString("");
 
-    // if(sf::Mouse::isButton(sf::Mouse::Middle)){
 
     
   }
