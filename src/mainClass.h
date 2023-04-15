@@ -37,8 +37,11 @@ class MainClass{
 
     //management functions
 
+      
     //manage node selection, give it the coords of the mouse IN the world
+    //returns true if we selected 
     void manageSelection(sf::Vector2f);
+    
     //manages node selection, will select all or none, when apropriate
     void manageSelection();
 

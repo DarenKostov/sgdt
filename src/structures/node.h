@@ -23,6 +23,8 @@ class Node{
     sf::RectangleShape body;
     sf::Text content;
 
+    //updates the postion and size of the content text
+    void updateContentProperties();
 
   public:
 
@@ -40,7 +42,7 @@ class Node{
     void setY(int);
     void setW(int);
     void setH(int);
-
+    void move(int, int);
 
     void draw(sf::RenderWindow&);
 
@@ -52,6 +54,9 @@ class Node{
     
     //tells you weather or not the box is colliding with these coords
     bool collidingWithCoords(int, int);
+  
+
+  
 };
 
 

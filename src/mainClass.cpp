@@ -58,6 +58,16 @@ void MainClass::startGUIProgram(){
   double ZoomFactor=1;
   bool editingText=false;
 
+
+  //stats setup
+  sf::Text stats;
+  stats.setCharacterSize(10);
+  stats.setFont(ubuntuFont);
+  stats.setFillColor(sf::Color::White);
+  stats.setPosition(1, 100);
+
+
+
   while (window.isOpen()){
     sf::Event event;
 
@@ -80,25 +90,80 @@ void MainClass::startGUIProgram(){
           
             break;
           case sf::Event::KeyReleased:
-            // sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)
+          
+            //we are diting text, dont take keys as command input
+            if(editingText==true)
+              break;
+
+            if(event.key.code==sf::Keyboard::A){
+              sf::Vector2f pos=window.mapPixelToCoords(sf::Mouse::getPosition(window), mapView);
+              nodes.insert(new Node((int)pos.x-50, (int)pos.y-25, 100, 50, ubuntuFont));
+            }
+          
             break;
           case sf::Event::KeyPressed:
 
+
+            
+            //set up editing mode
+            if(event.key.code==sf::Keyboard::Enter && selectedMainNode!=nullptr){
+
+              std::string content=selectedMainNode->getContent().getString();
+
+              if(editingText){
+                //remove the ">" signalling we are NOT editing
+                editingText=false;
+                if(content.size()!=0)
+                  content=content.substr(1, content.size());
+                selectedMainNode->setContent(content);
+              }else{
+                //add the ">" signalling we are editing
+                editingText=true;
+                selectedMainNode->setContent(">"+content);
+            
+              }
               
+              std::cout << "starting to edit!\n";
+            }
+
+            //we are diting text, dont take keys as command input
+            if(editingText==true)
+              break;
+
+          
             manageSelection();
 
             
           
           
             break;
+
+          case sf::Event::TextEntered:
+            if(editingText==true){
+                if (event.text.unicode<128){
+
+                  //remove the ">"
+                  std::string content=selectedMainNode->getContent().getString();
+                  if(content.size()!=0)
+                    content=content.substr(1, content.size());
+
+                  if(event.text.unicode==8){//if backspace
+                    content=content.substr(0, content.size()-1);
+                  }else{
+                    content += static_cast<char>(event.text.unicode);
+                  }
+
+                  //add the ">"
+                  selectedMainNode->setContent(">"+content);
+
+                }
+              }
+            break;
+            
+        
+        
           case sf::Event::MouseButtonPressed:
           
-            if(event.mouseButton.button==sf::Mouse::Right){
-              //take the mouse coords relative to the window and convert them to the window coords (with all the shifting and NOT scaling)
-              sf::Vector2f pos=window.mapPixelToCoords(sf::Mouse::getPosition(window), mapView);
-              nodes.insert(new Node((int)pos.x-50, (int)pos.y-25, 100, 50, ubuntuFont));
-              break;
-            }
 
             //=Manage the selection
             if(event.mouseButton.button==sf::Mouse::Left){
@@ -129,14 +194,44 @@ void MainClass::startGUIProgram(){
               sf::Vector2i shift=oldPos-pos;
               mapView.move(shift.x*ZoomFactor, shift.y*ZoomFactor);
               oldPos=pos;
-            }else{
+            }
           
-              oldPos=sf::Mouse::getPosition(window);
+
+
+            
+            //resize a box
+            if(sf::Mouse::isButtonPressed(sf::Mouse::Right)){
+              if(selectedMainNode==nullptr) break;
+
+            
+              sf::Vector2f pos=window.mapPixelToCoords(sf::Mouse::getPosition(window), mapView);
+            
+              int newWidth=pos.x-selectedMainNode->getX();
+              int newHeight=pos.y-selectedMainNode->getY();
+
+              selectedMainNode->setW(newWidth);
+              selectedMainNode->setH(newHeight);
+
+              // selectedMainNode->setW(newWidth);
+              // selectedMainNode->setH(newHeight);
+            
+            }
+            //move boxes
+            if(sf::Mouse::isButtonPressed(sf::Mouse::Left)){
+              
+              // sf::Vector2f pos=window.mapPixelToCoords(sf::Mouse::getPosition(window), mapView);
+              sf::Vector2i pos=sf::Mouse::getPosition(window);
+              sf::Vector2i shift=oldPos-pos;
+              for(auto selectedNode : selectedNodes){
+
+                selectedNode->move(shift.x*ZoomFactor, shift.y*ZoomFactor);
+              }
+              oldPos=pos;
+            
             }
 
-            
-
-            
+          
+          oldPos=sf::Mouse::getPosition(window);
           break;
         }
     }
@@ -162,22 +257,18 @@ void MainClass::startGUIProgram(){
       window.draw(node->getContent());
     }
 
-
+    //draw ui
     window.setView(UIView);
-    sf::Text stats;
-    stats.setCharacterSize(10);
-    stats.setFont(ubuntuFont);
-    stats.setFillColor(sf::Color::White);
-    stats.setPosition(1, 100);
-
-    
     sf::Vector2i pos=sf::Mouse::getPosition(window);
-    stats.setString(std::to_string(pos.x)+" : "+std::to_string(pos.y)+"\n"
+    stats.setString(stats.getString()+std::to_string(pos.x)+" : "+std::to_string(pos.y)+"\n"
       );
     window.draw(stats);
 
-    
+
+    //display everything
     window.display();
+
+    stats.setString("");
 
     // if(sf::Mouse::isButton(sf::Mouse::Middle)){
 
