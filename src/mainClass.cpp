@@ -18,7 +18,7 @@
 
 
 MainClass::MainClass(){
-  
+  editingText=false;
 }
 MainClass::~MainClass(){
   
@@ -56,7 +56,6 @@ void MainClass::startGUIProgram(){
 
   //how much have we zoomed
   double ZoomFactor=1;
-  bool editingText=false;
 
 
   //stats setup
@@ -108,22 +107,13 @@ void MainClass::startGUIProgram(){
             //set up editing mode
             if(event.key.code==sf::Keyboard::Enter && selectedMainNode!=nullptr){
 
-              std::string content=selectedMainNode->getContent().getString();
 
               if(editingText){
-                //remove the ">" signalling we are NOT editing
-                editingText=false;
-                if(content.size()!=0)
-                  content=content.substr(1, content.size());
-                selectedMainNode->setContent(content);
+                stopEditContentOfNode();
               }else{
-                //add the ">" signalling we are editing
-                editingText=true;
-                selectedMainNode->setContent(">"+content);
-            
+                startEditContentOfNode();            
               }
               
-              std::cout << "starting to edit!\n";
             }
 
             //we are diting text, dont take keys as command input
@@ -140,24 +130,9 @@ void MainClass::startGUIProgram(){
 
           case sf::Event::TextEntered:
             if(editingText==true){
-                if (event.text.unicode<128){
-
-                  //remove the ">"
-                  std::string content=selectedMainNode->getContent().getString();
-                  if(content.size()!=0)
-                    content=content.substr(1, content.size());
-
-                  if(event.text.unicode==8){//if backspace
-                    content=content.substr(0, content.size()-1);
-                  }else{
-                    content += static_cast<char>(event.text.unicode);
-                  }
-
-                  //add the ">"
-                  selectedMainNode->setContent(">"+content);
-
-                }
-              }
+              editContentOfNode(event.text.unicode);
+              std::cout << "editing!!!\n";
+            }
             break;
             
         
@@ -169,6 +144,11 @@ void MainClass::startGUIProgram(){
             if(event.mouseButton.button==sf::Mouse::Left){
               sf::Vector2f mousePos=window.mapPixelToCoords(sf::Mouse::getPosition(window), mapView);
               manageSelection(mousePos);
+              
+              for(auto selectedNode : selectedNodes){
+                selectedNode->prevXCoordinate=selectedNode->getX();
+                selectedNode->prevYCoordinate=selectedNode->getY();
+              }
             }
                         
             break;
@@ -186,15 +166,38 @@ void MainClass::startGUIProgram(){
             break;
           case sf::Event::MouseMoved:
           //==PAN
-            static sf::Vector2i oldPos;
+            static sf::Vector2f oldPos;
+            static sf::Vector2f oldPosMapView;
             
+            sf::Vector2f pos=window.mapPixelToCoords(sf::Mouse::getPosition(window), mapView);
+
             if(sf::Mouse::isButtonPressed(sf::Mouse::Middle)){
           
-              sf::Vector2i pos=sf::Mouse::getPosition(window);
-              sf::Vector2i shift=oldPos-pos;
-              mapView.move(shift.x*ZoomFactor, shift.y*ZoomFactor);
-              oldPos=pos;
+
+              sf::Vector2f newPos=-(pos-oldPos)+oldPosMapView;
+              mapView.setCenter(newPos);
             }
+
+            //move boxes
+            if(sf::Mouse::isButtonPressed(sf::Mouse::Left)){
+              
+              // sf::Vector2i shift=oldPos-pos;
+              for(auto selectedNode : selectedNodes){
+
+                // selectedNode->move(shift.x*ZoomFactor, shift.y*ZoomFactor);
+                int newX=pos.x-oldPos.x+selectedNode->prevXCoordinate;
+                int newY=pos.y-oldPos.y+selectedNode->prevYCoordinate;
+                
+                selectedNode->setX(newX);
+                selectedNode->setY(newY);
+              }
+            
+            }else{
+
+              oldPos=window.mapPixelToCoords(sf::Mouse::getPosition(window), mapView);
+              oldPosMapView=mapView.getCenter();
+            }
+
           
 
 
@@ -204,34 +207,14 @@ void MainClass::startGUIProgram(){
               if(selectedMainNode==nullptr) break;
 
             
-              sf::Vector2f pos=window.mapPixelToCoords(sf::Mouse::getPosition(window), mapView);
-            
               int newWidth=pos.x-selectedMainNode->getX();
               int newHeight=pos.y-selectedMainNode->getY();
 
               selectedMainNode->setW(newWidth);
               selectedMainNode->setH(newHeight);
 
-              // selectedMainNode->setW(newWidth);
-              // selectedMainNode->setH(newHeight);
             
             }
-            //move boxes
-            if(sf::Mouse::isButtonPressed(sf::Mouse::Left)){
-              
-              // sf::Vector2f pos=window.mapPixelToCoords(sf::Mouse::getPosition(window), mapView);
-              sf::Vector2i pos=sf::Mouse::getPosition(window);
-              sf::Vector2i shift=oldPos-pos;
-              for(auto selectedNode : selectedNodes){
-
-                selectedNode->move(shift.x*ZoomFactor, shift.y*ZoomFactor);
-              }
-              oldPos=pos;
-            
-            }
-
-          
-          oldPos=sf::Mouse::getPosition(window);
           break;
         }
     }
@@ -288,6 +271,10 @@ void MainClass::manageSelection(sf::Vector2f mousePos){
 
     for(auto node : nodes){
       if(node->collidingWithCoords(mousePos.x, mousePos.y)){
+        
+        if(selectedMainNode!=node)
+          stopEditContentOfNode();
+        
 
         selectedNodes.insert(node);
         selectedMainNode=node;
@@ -305,9 +292,11 @@ void MainClass::manageSelection(sf::Vector2f mousePos){
 
     for(auto node=selectedNodes.begin(); node!=selectedNodes.end(); node++){
       if((*node)->collidingWithCoords(mousePos.x, mousePos.y)){
-        if(selectedMainNode==*node)
+        if(selectedMainNode==*node){
+          stopEditContentOfNode();
           selectedMainNode=nullptr;
-        
+        }
+          
         selectedNodes.erase(node);
         std::cout << "selection removal\n";
         return;
@@ -323,6 +312,11 @@ void MainClass::manageSelection(sf::Vector2f mousePos){
     for(auto node : nodes){
       if(node->collidingWithCoords(mousePos.x, mousePos.y)){
         selectedNodes.clear();
+
+        
+        if(selectedMainNode!=node)
+          stopEditContentOfNode();
+        
         selectedMainNode=node;
         selectedNodes.insert(node);
         std::cout << "single selection\n";
@@ -334,6 +328,7 @@ void MainClass::manageSelection(sf::Vector2f mousePos){
   
   //clear selection
   selectedNodes.clear();
+  stopEditContentOfNode();
   selectedMainNode=nullptr;;
 
   
@@ -353,10 +348,43 @@ void MainClass::manageSelection(){
 
 }
 
-void editContentOfNode(Node&){
+void MainClass::editContentOfNode(sf::Uint32 in){
 
+  if (in<128){
+    //remove the ">"
+    std::string content=selectedMainNode->getContent().getString();
+    if(content.size()!=0)
+      content=content.substr(1, content.size());
 
+    if(in==8){//if backspace
+      content=content.substr(0, content.size()-1);
+    }else{
+      content += static_cast<char>(in);
+    }
 
+    //add the ">"
+    selectedMainNode->setContent(">"+content);
+  }
 
+}
+void MainClass::startEditContentOfNode(){
+  if(editingText) return;
+  std::cout << "starting to edit!\n";
+  editingText=true;
+  
+  //add the ">" signalling we are editing
+  std::string content=selectedMainNode->getContent().getString();
+  selectedMainNode->setContent(">"+content);
+}
+void MainClass::stopEditContentOfNode(){
+  if(!editingText) return;
+  std::cout << "stopping to edit!\n";
+  editingText=false;
+  
+  //remove the ">" signalling we are NOT editing
+  std::string content=selectedMainNode->getContent().getString();
+  if(content.size()!=0)
+    content=content.substr(1, content.size());
+  selectedMainNode->setContent(content);
 }
 

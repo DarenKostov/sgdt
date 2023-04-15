@@ -28,6 +28,9 @@ class Node{
 
   public:
 
+    int prevXCoordinate;
+    int prevYCoordinate;
+
     //constructor with X, Y, W, and H (and font)
     Node(int, int, int, int, sf::Font&);
 

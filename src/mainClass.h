@@ -21,6 +21,8 @@ class MainClass{
     std::set<Node*> selectedNodes;
     Node* selectedMainNode;
 
+    //tells us we are editing text
+    bool editingText;
     
   public:
 
@@ -46,7 +48,9 @@ class MainClass{
     void manageSelection();
 
     //manages editing the contest of the selected node
-    void editContentOfNode();
+    void editContentOfNode(sf::Uint32);
+    void stopEditContentOfNode();
+    void startEditContentOfNode();
 
 
 };

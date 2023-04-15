@@ -13,6 +13,8 @@
 Node::Node(int x, int y, int w, int h, sf::Font& font){
   XCoordinate=x;
   YCoordinate=y;
+  prevXCoordinate=x;
+  prevYCoordinate=y;
   Width=w;
   Height=h;
 
@@ -73,9 +75,9 @@ void Node::setH(int in){
 }
 
 void Node::move(int dx, int dy){
-  body.move(-dx, -dy);
-  XCoordinate-=dx;
-  YCoordinate-=dy;
+  body.move(dx, dy);
+  XCoordinate+=dx;
+  YCoordinate+=dy;
   updateContentProperties();
 }
 
