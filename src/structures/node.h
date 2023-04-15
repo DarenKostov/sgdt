@@ -11,7 +11,7 @@
 #ifndef NODE
 #define NODE
 #include <SFML/Graphics.hpp>
-
+#include <string>
 
 class Node{
 
@@ -21,12 +21,13 @@ class Node{
     int Width;
     int Height;
     sf::RectangleShape body;
+    sf::Text content;
 
 
   public:
 
-    //constructor with X, Y, W, and H
-    Node(int, int, int, int);
+    //constructor with X, Y, W, and H (and font)
+    Node(int, int, int, int, sf::Font&);
 
     //get X & Y coordinates and width & height
     int getX();
@@ -41,11 +42,16 @@ class Node{
     void setH(int);
 
 
-    void draw();
+    void draw(sf::RenderWindow&);
 
     sf::RectangleShape getBody();
+
+    //manages the content
+    sf::Text getContent();
+    void setContent(std::string);
     
-  
+    //tells you weather or not the box is colliding with these coords
+    bool collidingWithCoords(int, int);
 };
 
 

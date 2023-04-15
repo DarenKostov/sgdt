@@ -10,7 +10,7 @@
 #include "node.h"
 
 
-Node::Node(int x, int y, int w, int h){
+Node::Node(int x, int y, int w, int h, sf::Font& font){
   XCoordinate=x;
   YCoordinate=y;
   Width=w;
@@ -24,7 +24,13 @@ Node::Node(int x, int y, int w, int h){
   body.setOutlineColor(sf::Color::White);
   body.setFillColor(sf::Color::Transparent);
   body.setOutlineThickness(2);
-  
+
+  content.setString("New Text");
+  content.setCharacterSize(20);
+  content.setFont(font);
+  content.setFillColor(sf::Color::White);
+  content.setPosition(x, y);
+
 }
 
 int Node::getX(){
@@ -58,10 +64,28 @@ void Node::setH(int in){
 }
 
 
-void Node::draw(){
-  // window.draw(rectangle);
+void Node::draw(sf::RenderWindow& window){
+  //TODO?
+  // window.draw(body);
 }
 
 sf::RectangleShape Node::getBody(){
   return body;
 }
+
+sf::Text Node::getContent(){
+  return content;
+}
+void Node::setContent(std::string in){
+  content.setString(in);
+}
+
+
+bool Node::collidingWithCoords(int x, int y){
+  
+  if(x>XCoordinate && x<XCoordinate+Width)//we are on the same X level
+    if(y>YCoordinate && y<YCoordinate+Height)//we are on the same Y level
+      return true;
+  return false;
+}
+

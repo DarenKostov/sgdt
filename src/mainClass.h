@@ -11,12 +11,15 @@
 #include <SFML/Graphics.hpp>
 #include "structures/node.h"
 #include <vector>
+#include <set>
 
 class MainClass{
 
   private:
     //variables:
-    std::vector<Node> nodes;
+    std::set<Node*> nodes;
+    std::set<Node*> selectedNodes;
+    Node* selectedMainNode;
 
     
   public:
@@ -30,5 +33,17 @@ class MainClass{
     //the function that does all the logic, basically the main function
     void startCLIProgram();
     void startGUIProgram();
+
+
+    //management functions
+
+    //manage node selection, give it the coords of the mouse IN the world
+    void manageSelection(sf::Vector2f);
+    //manages node selection, will select all or none, when apropriate
+    void manageSelection();
+
+    //manages editing the contest of the selected node
+    void editContentOfNode();
+
 
 };

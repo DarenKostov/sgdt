@@ -16,10 +16,17 @@
 #include <SFML/Window.hpp>
 
 
+
 MainClass::MainClass(){
   
 }
 MainClass::~MainClass(){
+  
+  while(!nodes.empty()){
+    std::cout << "Erasing\n";
+    nodes.erase(nodes.begin());
+  }
+  
 }
 
 
@@ -49,6 +56,7 @@ void MainClass::startGUIProgram(){
 
   //how much have we zoomed
   double ZoomFactor=1;
+  bool editingText=false;
 
   while (window.isOpen()){
     sf::Event event;
@@ -74,17 +82,32 @@ void MainClass::startGUIProgram(){
           case sf::Event::KeyReleased:
             // sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)
             break;
-          case sf::Event::MouseButtonReleased:
-          
-            if(event.mouseButton.button==sf::Mouse::Left){
-              //take the mouse coords relative to the window and convert them to the window coords (with all the shifting and NOT scaling)
-              sf::Vector2f pos=window.mapPixelToCoords(sf::Mouse::getPosition(window), mapView);
-              Node newNode(pos.x-50, pos.y-25, 100, 50);
-              nodes.push_back(newNode);
-            }
+          case sf::Event::KeyPressed:
+
+              
+            manageSelection();
+
             
+          
+          
             break;
           case sf::Event::MouseButtonPressed:
+          
+            if(event.mouseButton.button==sf::Mouse::Right){
+              //take the mouse coords relative to the window and convert them to the window coords (with all the shifting and NOT scaling)
+              sf::Vector2f pos=window.mapPixelToCoords(sf::Mouse::getPosition(window), mapView);
+              nodes.insert(new Node((int)pos.x-50, (int)pos.y-25, 100, 50, ubuntuFont));
+              break;
+            }
+
+            //=Manage the selection
+            if(event.mouseButton.button==sf::Mouse::Left){
+              sf::Vector2f mousePos=window.mapPixelToCoords(sf::Mouse::getPosition(window), mapView);
+              manageSelection(mousePos);
+            }
+                        
+            break;
+          case sf::Event::MouseButtonReleased:
 
             break;
           case sf::Event::Resized:
@@ -121,8 +144,22 @@ void MainClass::startGUIProgram(){
     window.clear();
 
     window.setView(mapView);
+    //draw highlights
+    for(auto selectedNode : selectedNodes){
+      auto tmpNodeRecoloring=selectedNode->getBody();      
+      tmpNodeRecoloring.setFillColor(sf::Color(255, 66, 0, 100));
+
+      //the main selected node has a different color
+      if(selectedNode==selectedMainNode)
+        tmpNodeRecoloring.setFillColor(sf::Color(255, 162, 0, 100));
+      
+      window.draw(tmpNodeRecoloring);
+    }
+
+    //draw actual bodies
     for(auto node : nodes){
-      window.draw(node.getBody());
+      window.draw(node->getBody());
+      window.draw(node->getContent());
     }
 
 
@@ -153,4 +190,82 @@ void MainClass::startGUIProgram(){
 
 
 
+void MainClass::manageSelection(sf::Vector2f mousePos){
+
+  //selection addition
+  if(sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)){
+
+    for(auto node : nodes){
+      if(node->collidingWithCoords(mousePos.x, mousePos.y)){
+
+        selectedNodes.insert(node);
+        selectedMainNode=node;
+
+        std::cout << "selection addition\n";
+        return;
+      }
+    }
+
+    //return anyway, we are adding with the LShift we dont want to have a chance to remove
+    return;
+  
+  //selection removal
+  }else if(sf::Keyboard::isKeyPressed(sf::Keyboard::LControl)){
+
+    for(auto node=selectedNodes.begin(); node!=selectedNodes.end(); node++){
+      if((*node)->collidingWithCoords(mousePos.x, mousePos.y)){
+        if(selectedMainNode==*node)
+          selectedMainNode=nullptr;
+        
+        selectedNodes.erase(node);
+        std::cout << "selection removal\n";
+        return;
+      }
+    }
+    
+    //return anyway, we are removing 1 with the LCtrl we dont want to have a chance to remove more than 1
+    return;
+
+  //single selection
+  }else{
+
+    for(auto node : nodes){
+      if(node->collidingWithCoords(mousePos.x, mousePos.y)){
+        selectedNodes.clear();
+        selectedMainNode=node;
+        selectedNodes.insert(node);
+        std::cout << "single selection\n";
+        return;
+      }
+    }
+  }
+
+  
+  //clear selection
+  selectedNodes.clear();
+  selectedMainNode=nullptr;;
+
+  
+
+}
+
+void MainClass::manageSelection(){
+  if(sf::Keyboard::isKeyPressed(sf::Keyboard::LControl) && sf::Keyboard::isKeyPressed(sf::Keyboard::A)){
+    
+    selectedNodes.clear();
+    if(!sf::Keyboard::isKeyPressed(sf::Keyboard::LShift))
+      for(auto node : nodes){
+        selectedNodes.insert(node);
+      }
+      
+  }
+
+}
+
+void editContentOfNode(Node&){
+
+
+
+
+}
 
