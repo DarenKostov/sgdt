@@ -84,45 +84,33 @@ void MainGUIClass::startProgram(){
             }
           
             break;
-          case sf::Event::KeyReleased:
-          
-            //we are diting text, dont take keys as command input
-            if(editingText==true)
-              break;
 
-            if(event.key.code==sf::Keyboard::A){
-              sf::Vector2f pos=window.mapPixelToCoords(sf::Mouse::getPosition(window), mapView);
-              nodes.insert(new Box((int)pos.x-50, (int)pos.y-25, 100, 50, ubuntuFont));
-            }
-          
-            break;
           case sf::Event::KeyPressed:
-
-
-            
+           
             //set up editing mode
             if(event.key.code==sf::Keyboard::Enter && selectedMainNode!=nullptr){
-
-
               if(editingText){
                 stopEditContentOfNode();
               }else{
                 startEditContentOfNode();            
               }
-              
             }
 
             //we are diting text, dont take keys as command input
             if(editingText==true)
               break;
 
+            
           
             manageSelection();
 
-            
-          
-          
             break;
+
+
+
+
+
+
 
           case sf::Event::TextEntered:
             if(editingText==true){
@@ -133,6 +121,18 @@ void MainGUIClass::startProgram(){
             
         
         
+          case sf::Event::KeyReleased:
+          
+            //we are diting text, dont take keys as command input
+            if(editingText==true)
+              break;
+
+            if(event.key.code==sf::Keyboard::A && !sf::Keyboard::isKeyPressed(sf::Keyboard::LControl)){
+              sf::Vector2f pos=window.mapPixelToCoords(sf::Mouse::getPosition(window), mapView);
+              nodes.insert(new Box((int)pos.x-50, (int)pos.y-25, 100, 50, ubuntuFont));
+            }
+          
+            break;
           case sf::Event::MouseButtonPressed:
           
 
