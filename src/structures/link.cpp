@@ -1,3 +1,12 @@
+/*
+  Daren Kostov
+
+  Licence: GPLv3
+
+  the logic of the Link class
+  
+*/
+
 #include "link.h"
 
 
