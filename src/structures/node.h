@@ -28,6 +28,9 @@ class Node{
     //constructor with X, Y, W, and H (and font)
     Node(int, int, int, int);
 
+
+    virtual ~Node();
+
     //get X & Y coordinates and width & height
     int getX();
     int getY();

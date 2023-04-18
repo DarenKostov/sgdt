@@ -35,6 +35,9 @@ Box::Box(int x, int y, int w, int h, sf::Font& font): Node(x, y, w, h){
 }
 
 
+Box::~Box(){}
+
+  
 void Box::updatePreviousCoordinates(){
   prevXCoordinate=XCoordinate;
   prevYCoordinate=YCoordinate;

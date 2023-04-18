@@ -8,6 +8,7 @@
 */
 
 #include "node.h"
+#include <iostream>
 
 
 Node::Node(int x, int y, int w, int h){
@@ -19,6 +20,11 @@ Node::Node(int x, int y, int w, int h){
 
 }
 
+Node::~Node(){
+  std::cout << "deleting node\n";
+}
+
+  
 int Node::getX(){
   return XCoordinate;
 }
@@ -62,8 +68,8 @@ void Node::setContent(std::string in){
     //if its the default value, erase it
   if(content=="*New Text*"){
     content="";
-    return;
   }
+
   content=in;
 
 }

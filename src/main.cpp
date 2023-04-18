@@ -38,13 +38,14 @@ void atExitFree(MainClass* in){
     //store a static pointer to our Main
     static MainClass* eternalPtr;
 
-
+    
     //if we give it a valid pointer, store it; if not, delete it
     if(in){
         std::cout << "\e[93mStoring Main\n\e[0m";
         eternalPtr=in;
         atexit(freeVariable);
     }else{
+        std::cout << eternalPtr->i << "\n";
         std::cout << "\e[93mFreeing Main\n\e[0m";
         delete eternalPtr;
     }
@@ -95,7 +96,6 @@ int main(int argc, char **argv){
 
 
   MainClass* mainInstance;
-  atExitFree(mainInstance);
 
 
   if(useGUI){
@@ -103,6 +103,10 @@ int main(int argc, char **argv){
   }else{
     mainInstance=new MainCLIClass();
   }
+
+  //set the function to be freed AFTER pointing it to memory
+  atExitFree(mainInstance);
+  
   mainInstance->startProgram();
 
 }

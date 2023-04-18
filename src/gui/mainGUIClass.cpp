@@ -22,12 +22,8 @@ MainGUIClass::MainGUIClass(){
   editingText=false;
 }
 MainGUIClass::~MainGUIClass(){
-  
-  while(!nodes.empty()){
-    std::cout << "Erasing\n";
-    nodes.erase(nodes.begin());
-  }
-  
+  std::cout << "GUI class deleting\n";
+
 }
 
 
@@ -368,6 +364,7 @@ void MainGUIClass::editContentOfNode(sf::Uint32 in){
 }
 void MainGUIClass::startEditContentOfNode(){
   if(editingText) return;
+  
   std::cout << "starting to edit!\n";
   editingText=true;
   
@@ -377,6 +374,7 @@ void MainGUIClass::startEditContentOfNode(){
 }
 void MainGUIClass::stopEditContentOfNode(){
   if(!editingText) return;
+  
   std::cout << "stopping to edit!\n";
   editingText=false;
   

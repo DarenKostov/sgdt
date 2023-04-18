@@ -34,6 +34,8 @@ class Box : public Node{
     //constructor with X, Y, W, and H (and font)
     Box(int, int, int, int, sf::Font&);
 
+    ~Box();
+
     //get X & Y coordinates and width & height
     int getX();
     int getY();

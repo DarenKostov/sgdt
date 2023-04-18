@@ -22,6 +22,8 @@ class MainClass{
      
   public:
 
+    int i;
+    
     //constructor, like a atStartUp function
     MainClass();
 
