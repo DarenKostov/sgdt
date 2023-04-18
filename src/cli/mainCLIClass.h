@@ -1,9 +1,8 @@
 /*
   Daren Kostov
 
-  a class that contains the main startup and loop
+  a class that contains the main startup and loop for CLI
 
-  it's not called just "Main" because "main" is too close to it
   
 */
 

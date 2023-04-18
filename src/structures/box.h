@@ -3,7 +3,7 @@
 
   Licence: GPLv3
 
-  A node class that stores info about a node
+  A box class that is meant for gui
     
 */
 
@@ -35,12 +35,6 @@ class Box : public Node{
     Box(int, int, int, int, sf::Font&);
 
     ~Box();
-
-    //get X & Y coordinates and width & height
-    int getX();
-    int getY();
-    int getW();
-    int getH();
 
     //set X & Y coordinates and width & height
     void setX(int);

@@ -64,10 +64,11 @@ std::string Node::getContent(){
   return content;
 }
 void Node::setContent(std::string in){
-  content=in;
-    //if its the default value, erase it
+
+  //if its the default value, erase it
   if(content=="*New Text*"){
     content="";
+    return;
   }
 
   content=in;

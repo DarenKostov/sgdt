@@ -27,6 +27,16 @@ MainClass::~MainClass(){
 }
 
 void MainClass::startProgram(){
-
   std::cout << "Something has gone horribly wrong\n"; 
 }
+
+
+void MainClass::addNode(Node* in){
+  nodes.insert(in);
+}
+
+void MainClass::removeNode(Node* in){
+  nodes.erase(in);
+  delete in;
+}
+

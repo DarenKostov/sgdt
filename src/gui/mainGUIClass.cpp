@@ -25,13 +25,22 @@ MainGUIClass::~MainGUIClass(){
   std::cout << "GUI class deleting\n";
 
 }
+void MainGUIClass::removeNode(Node* in){
+  if(in==nullptr) return;
+
+  
+  selectedNodes.erase(in);
+  if(selectedMainNode==in)
+    selectedMainNode=nullptr;
+
+  MainClass::removeNode(in);
+}
 
 
 
 void MainGUIClass::startProgram(){
 
-  int mapX=12;
-  int mapY=12;
+  int mapX=12;  int mapY=12;
   
   sf::RenderWindow window(sf::VideoMode(mapX, mapY), "map");
 
@@ -129,7 +138,16 @@ void MainGUIClass::startProgram(){
 
             if(event.key.code==sf::Keyboard::A && !sf::Keyboard::isKeyPressed(sf::Keyboard::LControl)){
               sf::Vector2f pos=window.mapPixelToCoords(sf::Mouse::getPosition(window), mapView);
-              nodes.insert(new Box((int)pos.x-50, (int)pos.y-25, 100, 50, ubuntuFont));
+              addNode(new Box((int)pos.x-50, (int)pos.y-25, 100, 50, ubuntuFont));
+            }else if(event.key.code==sf::Keyboard::D){
+
+              while(!selectedNodes.empty())
+                removeNode(*selectedNodes.begin());
+            
+              // for(auto node : selectedNodes)
+              //   removeNode(node);
+             
+          
             }
           
             break;

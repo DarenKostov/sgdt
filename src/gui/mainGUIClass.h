@@ -1,9 +1,7 @@
 /*
   Daren Kostov
 
-  a class that contains the main startup and loop
-
-  it's not called just "Main" because "main" is too close to it
+  a class that contains the main startup and loop for GUI
   
 */
 
@@ -37,6 +35,9 @@ class MainGUIClass : public MainClass{
 
     //management functions
 
+    void removeNode(Node*);
+
+    //GUI management functions
       
     //manage node selection, give it the coords of the mouse IN the world
     //returns true if we selected 

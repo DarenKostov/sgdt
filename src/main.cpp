@@ -45,7 +45,6 @@ void atExitFree(MainClass* in){
         eternalPtr=in;
         atexit(freeVariable);
     }else{
-        std::cout << eternalPtr->i << "\n";
         std::cout << "\e[93mFreeing Main\n\e[0m";
         delete eternalPtr;
     }

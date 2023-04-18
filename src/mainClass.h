@@ -11,18 +11,20 @@
 
 
 #include "structures/node.h"
+#include "structures/link.h"
 #include <vector>
 #include <set>
+#include <unordered_map>
 
 class MainClass{
 
   protected:
     //variables:
     std::set<Node*> nodes;
-     
+    std::unordered_map<Node*, std::unordered_map<Node*, Link*>> links;
+
   public:
 
-    int i;
     
     //constructor, like a atStartUp function
     MainClass();
@@ -33,6 +35,14 @@ class MainClass{
     //the function that does all the logic, basically the main function
     virtual void startProgram();
 
+
+    //management functions
+
+    virtual void addNode(Node*);
+    virtual void removeNode(Node*);
+    // virtual void addLink();
+    // virtual void removeLink();
+  
 };
 
 #endif
