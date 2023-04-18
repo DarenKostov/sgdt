@@ -6,31 +6,36 @@
   it's not called just "Main" because "main" is too close to it
   
 */
-#ifndef MAIN_CLASS
-#define MAIN_CLASS
 
-
-#include "structures/node.h"
+// #include <SFML/Window.hpp>
+#include "../mainClass.h"
 #include <vector>
 #include <set>
 
-class MainClass{
+class MainCLIClass : public MainClass{
 
   protected:
     //variables:
     std::set<Node*> nodes;
-     
+    std::set<Node*> selectedNodes;
+    Node* selectedMainNode;
+
+    //tells us we are editing text
+    bool editingText;
+    
   public:
 
     //constructor, like a atStartUp function
-    MainClass();
+    MainCLIClass();
 
     //deconstror
-    virtual ~MainClass();
+    ~MainCLIClass();
 
     //the function that does all the logic, basically the main function
     virtual void startProgram();
 
-};
 
-#endif
+    //management functions
+
+   
+};

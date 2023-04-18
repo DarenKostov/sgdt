@@ -9,6 +9,8 @@
 */
 
 #include "mainClass.h"
+#include "gui/mainGUIClass.h"
+#include "cli/mainCLIClass.h"
 
 #include <iostream>
 #include <csignal>
@@ -92,14 +94,16 @@ int main(int argc, char **argv){
 
 
 
-  MainClass* mainInstance=new MainClass();
+  MainClass* mainInstance;
   atExitFree(mainInstance);
 
-  if(useGUI)
-    mainInstance->startGUIProgram();
-  else
-    mainInstance->startCLIProgram();
-  
+
+  if(useGUI){
+    mainInstance=new MainGUIClass();
+  }else{
+    mainInstance=new MainCLIClass();
+  }
+  mainInstance->startProgram();
 
 }
 
