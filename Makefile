@@ -3,23 +3,25 @@
 
 CXX= g++
 CXXFLAGS= -std=c++17
-LDFLAGS= -lsfml-graphics -lsfml-window -lsfml-system
-OBJFILES= bin/main.o bin/licence.o bin/mainClass.o bin/mainCLIClass.o bin/mainGUIClass.o
+SFMLFLAGS= -lsfml-graphics -lsfml-window -lsfml-system
+OBJFILES= bin/main.o bin/licence.o bin/mainClass.o bin/mainCLIClass.o bin/node.o bin/link.o
+GUIOBJFILES= bin/mainGUIClass.o bin/box.o bin/connector.o
 TARGET= bin/sgdt
 
-nocli:
-	$(eval LDFLAGS=)
-	$(eval OBJFILES=bin/main.o bin/licence.o bin/mainClass.o bin/mainCLIClass.o bin/mainGUIClassRemoved.o)
-	@echo NO CLI
-	@echo $(OBJFILES)
 
 all: $(TARGET)
 
 
-$(TARGET) : $(OBJFILES)
+	
+
+
+$(TARGET): $(OBJFILES) $(GUIOBJFILES)
 	@echo FINAL BINARY:
-	@echo $(OBJFILES)
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJFILES) -o $(TARGET)
+	$(CXX) $(CXXFLAGS) $(SFMLFLAGS) $(OBJFILES) $(GUIOBJFILES) -o $(TARGET)
+	
+nogui: $(OBJFILES) bin/mainGUIClassRemoved.o
+	@echo FINAL BINARY:
+	$(CXX) $(CXXFLAGS) $(OBJFILES) bin/mainGUIClassRemoved.o -o $(TARGET)
 
 
 
@@ -33,7 +35,7 @@ bin/licence.o: src/licence.cpp
 	
 
 
-bin/mainClass.o: src/mainClass.cpp src/mainClass.h
+bin/mainClass.o: src/mainClass.cpp src/mainClass.h bin/node.o bin/link.o
 	@echo MAIN CLASS:
 	$(CXX) $(CXXFLAGS) src/mainClass.cpp -c -o bin/mainClass.o
 
@@ -48,28 +50,27 @@ bin/node.o: src/structures/node.cpp src/structures/node.h
 	$(CXX) $(CXXFLAGS) src/structures/node.cpp -c -o bin/node.o
 	
 bin/link.o: src/structures/link.cpp src/structures/link.h
-	@echo link:
+	@echo LINK:
 	$(CXX) $(CXXFLAGS) src/structures/link.cpp -c -o bin/link.o
 
 
 
 # # GUI
-bin/mainGUIClass.o: src/gui/mainGUIClass.cpp src/gui/mainGUIClass.h
+bin/mainGUIClass.o: src/gui/mainGUIClass.cpp src/gui/mainGUIClass.h bin/box.o bin/connector.o
 	@echo GUI:
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) src/gui/mainGUIClass.cpp -c -o bin/mainGUIClass.o
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) src/gui/mainGUIClassRemoved.cpp -c -o bin/mainGUIClassRemoved.o
+	$(CXX) $(CXXFLAGS) $(SFMLFLAGS) src/gui/mainGUIClass.cpp -c -o bin/mainGUIClass.o
 	
-# bin/mainGUIClassRemoved.o: mainGUIClassRemoved.cpp src/gui/mainGUIClass.h
-# 	@echo REMOVE GUI:
-# 	$(CXX) $(CXXFLAGS) $(LDFLAGS) src/gui/mainGUIClassRemoved.cpp -c -o bin/mainGUIClassRemoved.o
+bin/mainGUIClassRemoved.o: src/gui/mainGUIClassRemoved.cpp src/gui/mainGUIClass.h
+	@echo REMOVE GUI:
+	$(CXX) $(CXXFLAGS) src/gui/mainGUIClassRemoved.cpp -c -o bin/mainGUIClassRemoved.o
 	
 bin/box.o: src/structures/box.cpp src/structures/box.h src/structures/node.h
 	@echo BOX:
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) src/structures/box.cpp -c -o bin/box.o
+	$(CXX) $(CXXFLAGS) $(SFMLFLAGS) src/structures/box.cpp -c -o bin/box.o
 	
 bin/connector.o: src/structures/connector.cpp src/structures/connector.h src/structures/link.h
 	@echo CONNECTOR:
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) src/structures/connector.cpp -c -o bin/connector.o
+	$(CXX) $(CXXFLAGS) $(SFMLFLAGS) src/structures/connector.cpp -c -o bin/connector.o
 
 
 clean:
@@ -77,5 +78,6 @@ clean:
 
 
 
+.PHONY: clean nogui all
 
 

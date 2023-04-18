@@ -30,4 +30,5 @@ MainCLIClass::~MainCLIClass(){
 
 
 void MainCLIClass::startProgram(){
+  std::cout << "This is CLI\n";
 }

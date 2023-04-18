@@ -18,6 +18,7 @@
 
 
 
+
 MainGUIClass::MainGUIClass(){
   editingText=false;
 }
