@@ -140,7 +140,7 @@ void MainGUIClass::startProgram(){
             if(event.key.code==sf::Keyboard::A && !sf::Keyboard::isKeyPressed(sf::Keyboard::LControl)){
               sf::Vector2f pos=window.mapPixelToCoords(sf::Mouse::getPosition(window), mapView);
               addNode(new Box((int)pos.x-50, (int)pos.y-25, 100, 50, ubuntuFont));
-            }else if(event.key.code==sf::Keyboard::D){
+            }else if(event.key.code==sf::Keyboard::D || event.key.code==sf::Keyboard::Delete || event.key.code==sf::Keyboard::Backspace){
 
               while(!selectedNodes.empty())
                 removeNode(*selectedNodes.begin());

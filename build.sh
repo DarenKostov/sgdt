@@ -2,9 +2,6 @@
 
 # WIP
 
-
-
-
 echo "MAIN:"
 g++ -lsfml-graphics -lsfml-window -lsfml-system src/main.cpp -c -o bin/main.o
 echo "LICENCE:"
@@ -23,8 +20,6 @@ g++ -lsfml-graphics -lsfml-window -lsfml-system src/cli/mainCLIClass.cpp -c -o b
 
 echo "GUI:"
 g++ -lsfml-graphics -lsfml-window -lsfml-system src/gui/mainGUIClass.cpp -c -o bin/mainGUIClass.o
-echo "BOX:"
-g++ -lsfml-graphics -lsfml-window -lsfml-system src/structures/box.cpp -c -o bin/box.o
 echo "BOX:"
 g++ -lsfml-graphics -lsfml-window -lsfml-system src/structures/box.cpp -c -o bin/box.o
 

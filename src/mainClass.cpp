@@ -24,6 +24,17 @@ MainClass::~MainClass(){
       std::cout << "Erasing\n";
       nodes.erase(nodes.begin());
     }
+
+    for(auto& row : links) {
+      auto& linksRow=row.second;
+      for(auto& link : linksRow) {
+        delete link.second;
+      }
+      linksRow.clear();
+    }
+    links.clear();
+
+  
 }
 
 void MainClass::startProgram(){
@@ -33,10 +44,84 @@ void MainClass::startProgram(){
 
 void MainClass::addNode(Node* in){
   nodes.insert(in);
+
+  /*add to the 2d table
+  
+    we are adding w
+    - means nullptr
+    = means any Link* or nullptr
+    + means un-initialized or doesn't exist
+
+    goal:
+  
+      a b c w
+    a = = = -
+    b = = = -
+    c = = = -
+    w - - - -
+  
+  */
+
+
+  
+  links[in]= std::unordered_map<Node*, Link*>();
+  /*^^^^^^
+      a b c
+    a = = =
+    b = = =
+    c = = =
+    w + + +
+  */
+
+
+  
+  for(auto& row : links){
+    links[in][row.first]=nullptr;
+    /*^^^^^^
+        a b c w
+      a = = = +
+      b = = = +
+      c = = = +
+      w - - - -
+    */
+    links[row.first][in]=nullptr;
+    /*^^^^^^
+        a b c w
+      a = = = -
+      b = = = -
+      c = = = -
+      w + + + -
+    */
+    
+  }
+
+  
 }
 
 void MainClass::removeNode(Node* in){
   nodes.erase(in);
+
+  
+  for(auto& row : links){
+    //free the memory
+    delete links[in][row.first];
+    delete links[row.first][in];
+
+    //remove on the Y axis
+    links[row.first].erase(in);
+  }
+
+  //remove on the X axis
+  links.erase(in);
+  
   delete in;
 }
 
+void MainClass::addLink(Node* from, Node* to, Link* in){
+
+  //connect a node to itself?
+  if(from==to) return;
+  
+  links[from][to]=in;
+
+}
