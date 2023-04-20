@@ -21,14 +21,19 @@ MainClass::~MainClass(){
     std::cout << "Main class deleting\n";
   
     while(!nodes.empty()){
-      std::cout << "Erasing\n";
+      std::cout << "Erasing node\n";
       nodes.erase(nodes.begin());
     }
 
     for(auto& row : links) {
       auto& linksRow=row.second;
       for(auto& link : linksRow) {
-        delete link.second;
+
+        if(link.second!=nullptr){//if statemtn not neccesery but fixes the amount of "Erasing link" messages
+          std::cout << "Erasing link\n";
+          delete link.second;
+        }
+
       }
       linksRow.clear();
     }
@@ -101,13 +106,18 @@ void MainClass::addNode(Node* in){
 void MainClass::removeNode(Node* in){
   nodes.erase(in);
 
+
+  //remove the links associated with this node
   
+  //free the memory
   for(auto& row : links){
-    //free the memory
     delete links[in][row.first];
     delete links[row.first][in];
+  }
 
-    //remove on the Y axis
+  
+  //remove on the Y axis
+  for(auto& row : links){
     links[row.first].erase(in);
   }
 
@@ -127,7 +137,10 @@ void MainClass::addLink(Node* from, Node* to, Link* in){
   //connect a node to itself?
   if(from==to) return;
 
+  //we are not overwriting a link right?
+  if(links[from][to]!=nullptr) return;
 
+  
   std::cout << "creating link\n";
   
   links[from][to]=in;

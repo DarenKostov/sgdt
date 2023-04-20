@@ -174,7 +174,14 @@ void MainGUIClass::startProgram(){
             if(event.mouseButton.button==sf::Mouse::Right){
               sf::Vector2f mousePos=window.mapPixelToCoords(sf::Mouse::getPosition(window), mapView);
               auto connectTo=hoveringOver(mousePos.x, mousePos.y);
-              addLink(selectedMainNode, connectTo, new Connector());
+
+              //we actually have to nodes to connect right?
+              if(connectTo==nullptr) break;
+              if(selectedMainNode==nullptr) break;
+
+            
+              addLink(selectedMainNode, connectTo, new Connector(static_cast<Box*>(selectedMainNode), static_cast<Box*>(connectTo)));
+              selectedMainNode=nullptr;  
             }
 
 
@@ -215,6 +222,19 @@ void MainGUIClass::startProgram(){
                 
                 selectedNode->setX(newX);
                 selectedNode->setY(newY);
+
+              //update the link positions
+              for(auto node : nodes){
+
+                //the links actually exist right? if so update them
+                if(links[selectedNode][node]!=nullptr)
+                  static_cast<Connector*>(links[selectedNode][node])->updatePositions();
+                if(links[node][selectedNode]!=nullptr)
+                  static_cast<Connector*>(links[node][selectedNode])->updatePositions();
+                
+              }
+
+              
               }
             
             }else{
@@ -264,8 +284,7 @@ void MainGUIClass::startProgram(){
 
     //draw actual bodies
     for(auto node : nodes){
-      window.draw(static_cast<Box*>(node)->getBody());
-      window.draw(static_cast<Box*>(node)->getContentText());
+      static_cast<Box*>(node)->draw(window);
     }
 
     //draw links
@@ -276,16 +295,8 @@ void MainGUIClass::startProgram(){
         auto y=link.first;
 
         if(links[x][y]==nullptr) continue;
-
-
-        sf::Vertex line[] =
-        {
-          sf::Vertex(sf::Vector2f(x->getX()+x->getW()/2, x->getY()+x->getH()/2)),
-          sf::Vertex(sf::Vector2f(y->getX()+y->getW()/2, y->getY()+y->getH()/2))
-        };
-
-        window.draw(line, 2, sf::Lines);
-        
+          static_cast<Connector*>(links[x][y])->draw(window);
+       
       }
     }    
 

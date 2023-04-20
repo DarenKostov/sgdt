@@ -101,7 +101,6 @@ bool Box::collidingWithCoords(int x, int y){
 
 void Box::updateContentProperties(){
 
-
   //center the origin of the text
   auto properties=contentText.getLocalBounds();
   contentText.setOrigin(properties.left+properties.width/2.0f, properties.top+properties.height/2.0f);
@@ -111,4 +110,9 @@ void Box::updateContentProperties(){
 
 }
 
+
+void Box::draw(sf::RenderWindow& window){
+  window.draw(body);
+  window.draw(contentText);
+}
 

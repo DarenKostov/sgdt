@@ -13,8 +13,9 @@
 #include <SFML/Graphics.hpp>
 #include <string>
 #include "node.h"
+#include "guiElement.h"
 
-class Box : public Node{
+class Box : public Node, public GUIElement{
 
   private:
     sf::RectangleShape body;
@@ -43,8 +44,6 @@ class Box : public Node{
     void setH(int);
     void move(int, int);
 
-    void draw(sf::RenderWindow&);
-
     sf::RectangleShape getBody();
 
     //manages the content
@@ -54,6 +53,8 @@ class Box : public Node{
     //tells you weather or not the box is colliding with these coords
     bool collidingWithCoords(int, int);
 
+    //draws itself on a RenderWindow
+    void draw(sf::RenderWindow&);
 
   
 };

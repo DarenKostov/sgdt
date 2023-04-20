@@ -64,11 +64,11 @@ bin/mainGUIClassRemoved.o: src/gui/mainGUIClassRemoved.cpp src/gui/mainGUIClass.
 	@echo REMOVE GUI:
 	$(CXX) $(CXXFLAGS) src/gui/mainGUIClassRemoved.cpp -c -o bin/mainGUIClassRemoved.o
 	
-bin/box.o: src/structures/box.cpp src/structures/box.h src/structures/node.h
+bin/box.o: src/structures/box.cpp src/structures/box.h src/structures/node.h src/structures/guiElement.h
 	@echo BOX:
 	$(CXX) $(CXXFLAGS) $(SFMLFLAGS) src/structures/box.cpp -c -o bin/box.o
 	
-bin/connector.o: src/structures/connector.cpp src/structures/connector.h src/structures/link.h
+bin/connector.o: src/structures/connector.cpp src/structures/connector.h src/structures/link.h src/structures/guiElement.h
 	@echo CONNECTOR:
 	$(CXX) $(CXXFLAGS) $(SFMLFLAGS) src/structures/connector.cpp -c -o bin/connector.o
 
