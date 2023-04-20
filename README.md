@@ -1,2 +1,5 @@
 # sgdt
 Simple Graphing/Diagramming Tool
+
+NO PULL REQUESTS UNTIL I FINISH THE SCHOOL PART OF THE PROJECT
+
