@@ -167,10 +167,10 @@ void MainGUIClass::startProgram(){
             if(event.mouseButton.button==sf::Mouse::Right){
               
             
-              sf::Vector2f mousePos=window.mapPixelToCoords(sf::Mouse::getPosition(window), mapView);
+              // sf::Vector2f mousePos=window.mapPixelToCoords(sf::Mouse::getPosition(window), mapView);
             
             
-              manageSelection(mousePos.x, mousePos.y);
+              // manageSelection(mousePos.x, mousePos.y);
               
             }
                         
@@ -291,69 +291,63 @@ void MainGUIClass::startProgram(){
 
 void MainGUIClass::manageSelection(float mouseX, float mouseY){
 
+
+  //the node we will be working with
+  auto node=hoveringOver(mouseX, mouseY);
+
+
+  //clear selection if we did not click on a node
+  if(node==nullptr){
+    selectedNodes.clear();
+    stopEditContentOfNode();
+    selectedMainNode=nullptr;;
+    return;
+  }
+  
   //selection addition
   if(sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)){
 
-    for(auto node : nodes){
-      if(node->collidingWithCoords(mouseX, mouseY)){
-        
-        if(selectedMainNode!=node)
-          stopEditContentOfNode();
-        
-        selectedNodes.insert(static_cast<Box*>(node));
-        selectedMainNode=static_cast<Box*>(node);
 
-        std::cout << "selection addition\n";
-        return;
-      }
-    }
+      
+    if(selectedMainNode!=node)
+      stopEditContentOfNode();
+    
+    selectedNodes.insert(static_cast<Box*>(node));
+    selectedMainNode=static_cast<Box*>(node);
 
-    //return anyway, we are adding with the LShift we dont want to have a chance to remove
+    std::cout << "selection addition\n";
     return;
+
   
   //selection removal
   }else if(sf::Keyboard::isKeyPressed(sf::Keyboard::LControl)){
 
-    for(auto node=selectedNodes.begin(); node!=selectedNodes.end(); node++){
-      if((*node)->collidingWithCoords(mouseX, mouseY)){
-        if(selectedMainNode==*node){
-          stopEditContentOfNode();
-          selectedMainNode=nullptr;
-        }
-          
-        selectedNodes.erase(node);
-        std::cout << "selection removal\n";
-        return;
-      }
+    if(selectedMainNode==node){
+      stopEditContentOfNode();
+      selectedMainNode=nullptr;
     }
-    
-    //return anyway, we are removing 1 with the LCtrl we dont want to have a chance to remove more than 1
+      
+    selectedNodes.erase(node);
+    std::cout << "selection removal\n";
     return;
+    
 
   //single selection
   }else{
 
-    for(auto node : nodes){
-      if(node->collidingWithCoords(mouseX, mouseY)){
-        selectedNodes.clear();
+    selectedNodes.clear();
 
-        
-        if(selectedMainNode!=node)
-          stopEditContentOfNode();
-        
-        selectedMainNode=node;
-        selectedNodes.insert(node);
-        std::cout << "single selection\n";
-        return;
-      }
-    }
+    
+    if(selectedMainNode!=node)
+      stopEditContentOfNode();
+    
+    selectedMainNode=node;
+    selectedNodes.insert(node);
+    std::cout << "single selection\n";
+    return;
   }
 
   
-  //clear selection
-  selectedNodes.clear();
-  stopEditContentOfNode();
-  selectedMainNode=nullptr;;
 
   
 
