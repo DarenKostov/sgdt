@@ -22,6 +22,8 @@ class Connector : public Link{
     Box* pointStart;
     Box* pointEnd;
     sf::Vertex line[2];
+  
+    sf::Vertex arrow[3];
     
   public:
     Connector(Box*, Box*);
