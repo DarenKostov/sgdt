@@ -118,9 +118,17 @@ void MainClass::removeNode(Node* in){
 }
 
 void MainClass::addLink(Node* from, Node* to, Link* in){
+  
+  //all of the inputs exist right?
+  if(from==nullptr) return;
+  if(to==nullptr) return;
+  if(in==nullptr) return;
 
   //connect a node to itself?
   if(from==to) return;
+
+
+  std::cout << "creating link\n";
   
   links[from][to]=in;
 

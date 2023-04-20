@@ -13,6 +13,7 @@
 #include "mainGUIClass.h"
 #include <iostream>
 #include "../structures/box.h"
+#include "../structures/connector.h"
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 
@@ -153,30 +154,31 @@ void MainGUIClass::startProgram(){
           
             break;
           case sf::Event::MouseButtonPressed:
-          
 
-            //=Manage the selection
-            if(event.mouseButton.button==sf::Mouse::Left){
+            {
               sf::Vector2f mousePos=window.mapPixelToCoords(sf::Mouse::getPosition(window), mapView);
-            
-            
-              manageSelection(mousePos.x, mousePos.y);
-              
-            }
+
+              //=Manage the selection
+              if(event.mouseButton.button==sf::Mouse::Left){
+                manageSelection(mousePos.x, mousePos.y);
+              }
           
-            if(event.mouseButton.button==sf::Mouse::Right){
-              
-            
-              // sf::Vector2f mousePos=window.mapPixelToCoords(sf::Mouse::getPosition(window), mapView);
-            
-            
-              // manageSelection(mousePos.x, mousePos.y);
-              
+              if(event.mouseButton.button==sf::Mouse::Right){
+                selectedMainNode=hoveringOver(mousePos.x, mousePos.y);  
+              }
             }
-                        
+                                  
             break;
           case sf::Event::MouseButtonReleased:
 
+            if(event.mouseButton.button==sf::Mouse::Right){
+              sf::Vector2f mousePos=window.mapPixelToCoords(sf::Mouse::getPosition(window), mapView);
+              auto connectTo=hoveringOver(mousePos.x, mousePos.y);
+              addLink(selectedMainNode, connectTo, new Connector());
+            }
+
+
+            
             break;
           case sf::Event::Resized:
 
@@ -230,7 +232,7 @@ void MainGUIClass::startProgram(){
             
             //resize a box
             if(sf::Mouse::isButtonPressed(sf::Mouse::Right)){
-              if(selectedMainNode==nullptr) break;
+              if(selectedMainNode==nullptr || editingText==false) break;
 
             
               int newWidth=pos.x-selectedMainNode->getX();
@@ -265,6 +267,29 @@ void MainGUIClass::startProgram(){
       window.draw(static_cast<Box*>(node)->getBody());
       window.draw(static_cast<Box*>(node)->getContentText());
     }
+
+    //draw links
+    for(auto& row : links) {
+      auto& linksRow=row.second;
+      auto x=row.first;
+      for(auto& link : linksRow) {
+        auto y=link.first;
+
+        if(links[x][y]==nullptr) continue;
+
+
+        sf::Vertex line[] =
+        {
+          sf::Vertex(sf::Vector2f(x->getX()+x->getW()/2, x->getY()+x->getH()/2)),
+          sf::Vertex(sf::Vector2f(y->getX()+y->getW()/2, y->getY()+y->getH()/2))
+        };
+
+        window.draw(line, 2, sf::Lines);
+        
+      }
+    }    
+
+
 
     //draw ui
     window.setView(UIView);
