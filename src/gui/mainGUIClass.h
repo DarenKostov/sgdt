@@ -40,11 +40,14 @@ class MainGUIClass : public MainClass{
     //GUI management functions
       
     //manage node selection, give it the coords of the mouse IN the world
-    //returns true if we selected 
     void manageSelection(float, float);
     
     //manages node selection, will select all or none, when apropriate
     void manageSelection();
+
+    //returns you what the mouse is hovering over (if you give it the mouse coords), if nothing returns nullptr
+    Node* hoveringOver(float, float);
+
 
     //manages editing the contest of the selected node
     void editContentOfNode(uint32_t);

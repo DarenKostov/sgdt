@@ -163,6 +163,16 @@ void MainGUIClass::startProgram(){
               manageSelection(mousePos.x, mousePos.y);
               
             }
+          
+            if(event.mouseButton.button==sf::Mouse::Right){
+              
+            
+              sf::Vector2f mousePos=window.mapPixelToCoords(sf::Mouse::getPosition(window), mapView);
+            
+            
+              manageSelection(mousePos.x, mousePos.y);
+              
+            }
                         
             break;
           case sf::Event::MouseButtonReleased:
@@ -404,3 +414,10 @@ void MainGUIClass::stopEditContentOfNode(){
   selectedMainNode->setContent(content);
 }
 
+Node* MainGUIClass::hoveringOver(float mouseX, float mouseY){
+      for(auto node : nodes)
+        if(node->collidingWithCoords(mouseX, mouseY))
+          return node;
+
+  return nullptr;
+}
