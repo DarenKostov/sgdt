@@ -225,13 +225,11 @@ void MainGUIClass::startProgram(){
 
               //update the link positions
               for(auto node : nodes){
-
                 //the links actually exist right? if so update them
                 if(links[selectedNode][node]!=nullptr)
                   static_cast<Connector*>(links[selectedNode][node])->updatePositions();
                 if(links[node][selectedNode]!=nullptr)
                   static_cast<Connector*>(links[node][selectedNode])->updatePositions();
-                
               }
 
               
@@ -260,6 +258,15 @@ void MainGUIClass::startProgram(){
 
               selectedMainNode->setW(newWidth);
               selectedMainNode->setH(newHeight);
+
+              //update the link positions
+              for(auto node : nodes){
+                //the links actually exist right? if so update them
+                if(links[selectedMainNode][node]!=nullptr)
+                  static_cast<Connector*>(links[selectedMainNode][node])->updatePositions();
+                if(links[node][selectedMainNode]!=nullptr)
+                  static_cast<Connector*>(links[node][selectedMainNode])->updatePositions();
+              }
 
             
             }

@@ -61,10 +61,15 @@ void Connector::updatePositions(){
 
     if(didItHappen==false){
       if(pointA.y<=rectCenterY)
-        pointB=getIntersection(pointA, pointBTmp, sf::Vector2f(rectMinX, rectMinY), sf::Vector2f(rectMaxX, rectMinY));
+        pointB=getIntersection(pointA, pointBTmp, sf::Vector2f(rectMinX, rectMinY), sf::Vector2f(rectMaxX, rectMinY), didItHappen);
       else
-        pointB=getIntersection(pointA, pointBTmp, sf::Vector2f(rectMinX, rectMaxY), sf::Vector2f(rectMaxX, rectMaxY));
+        pointB=getIntersection(pointA, pointBTmp, sf::Vector2f(rectMinX, rectMaxY), sf::Vector2f(rectMaxX, rectMaxY), didItHappen);
     }
+
+      //no intersections?? at least have the point on the box
+      if(didItHappen==false)
+        pointB=pointBTmp;
+    
   }
   
   //Manage starting point
@@ -86,13 +91,17 @@ void Connector::updatePositions(){
 
     if(didItHappen==false){
       if(pointBTmp.y<=rectCenterY)
-        pointA=getIntersection(pointATmp, pointBTmp, sf::Vector2f(rectMinX, rectMinY), sf::Vector2f(rectMaxX, rectMinY));
+        pointA=getIntersection(pointATmp, pointBTmp, sf::Vector2f(rectMinX, rectMinY), sf::Vector2f(rectMaxX, rectMinY), didItHappen);
       else
-        pointA=getIntersection(pointATmp, pointBTmp, sf::Vector2f(rectMinX, rectMaxY), sf::Vector2f(rectMaxX, rectMaxY));
+        pointA=getIntersection(pointATmp, pointBTmp, sf::Vector2f(rectMinX, rectMaxY), sf::Vector2f(rectMaxX, rectMaxY), didItHappen);
     }
 
 
-
+      //no intersections?? at least have the point on the box
+      if(didItHappen==false)
+        pointA=pointATmp;
+  
+    
   }
   
       
@@ -134,25 +143,25 @@ sf::Vector2f getIntersection(sf::Vector2f p1A, sf::Vector2f p2A, sf::Vector2f p1
 
     didItHappen=false;
   
-    float determinant=(p1A.x-p2A.x)*(p1B.y-p2B.y)-(p1A.y-p2A.y)*(p1B.x-p2B.x);
+    double determinant=(p1A.x-p2A.x)*(p1B.y-p2B.y)-(p1A.y-p2A.y)*(p1B.x-p2B.x);
 
 
     //does the point exist?
-    if(determinant<1 && determinant>-1){
+    if(determinant==0){
       return sf::Vector2f();
     }
 
   
-    float pre=(p1A.x*p2A.y-p1A.y*p2A.x);
-    float post=(p1B.x*p2B.y-p1B.y*p2B.x);
-    float x=(pre*(p1B.x-p2B.x)-(p1A.x-p2A.x)*post)/determinant;
-    float y=(pre*(p1B.y-p2B.y)-(p1A.y-p2A.y)*post)/determinant;
+    double pre=(p1A.x*p2A.y-p1A.y*p2A.x);
+    double post=(p1B.x*p2B.y-p1B.y*p2B.x);
+    double x=(pre*(p1B.x-p2B.x)-(p1A.x-p2A.x)*post)/determinant;
+    double y=(pre*(p1B.y-p2B.y)-(p1A.y-p2A.y)*post)/determinant;
 
-
+  
     //is the point on the 2 lines?
-    if(x<fmin(p1A.x,p2A.x) || x>fmax(p1A.x,p2A.x) || x<fmin(p1B.x,p2B.x) || x>fmax(p1B.x,p2B.x))
+    if(x<std::min(p1A.x,p2A.x) || x>std::max(p1A.x,p2A.x) || x<std::min(p1B.x,p2B.x) || x>std::max(p1B.x,p2B.x))
       return sf::Vector2f();
-    if(y<fmin(p1A.y,p2A.y) || y>fmax(p1A.y,p2A.y) || y<fmin(p1B.y,p2B.y) || y>fmax(p1B.y,p2B.y))
+    if(y<std::min(p1A.y,p2A.y) || y>std::max(p1A.y,p2A.y) || y<std::min(p1B.y,p2B.y) || y>std::max(p1B.y,p2B.y))
       return sf::Vector2f();
 
 
