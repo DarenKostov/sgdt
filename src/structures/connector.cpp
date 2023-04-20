@@ -13,6 +13,7 @@
 
 #define _USE_MATH_DEFINES
 #include <cmath>
+#include <iostream>
 
 Connector::Connector(Box* start, Box* end){
   pointStart=start;
@@ -25,10 +26,49 @@ Connector::~Connector(){}
 
 void Connector::updatePositions(){
 
+  
+  
+  
   sf::Vector2f pointA=sf::Vector2f(pointStart->getX()+pointStart->getW()/2, pointStart->getY()+pointStart->getH()/2);
   sf::Vector2f pointB=sf::Vector2f(pointEnd->getX()+pointEnd->getW()/2, pointEnd->getY()+pointEnd->getH()/2);
-  
+  sf::Vector2f pointBTmp=pointB;
 
+  
+  {
+    float rectMinX=pointEnd->getX();
+    float rectMinY=pointEnd->getY();
+    float rectMaxX=pointEnd->getX()+pointEnd->getW();
+    float rectMaxY=pointEnd->getY()+pointEnd->getH();
+
+    if(pointA.x<rectMinX)
+      pointB.x=rectMinX;
+    else if(pointA.x>rectMaxX)
+      pointB.x=rectMaxX;
+
+    if(pointA.y<rectMinY)
+      pointB.y=rectMinY;
+    else if(pointA.y>rectMaxY)
+      pointB.y=rectMaxY;
+  }
+  
+  {
+    float rectMinX=pointStart->getX();
+    float rectMinY=pointStart->getY();
+    float rectMaxX=pointStart->getX()+pointStart->getW();
+    float rectMaxY=pointStart->getY()+pointStart->getH();
+
+    if(pointBTmp.x<rectMinX)
+      pointA.x=rectMinX;
+    else if(pointBTmp.x>rectMaxX)
+      pointA.x=rectMaxX;
+
+    if(pointBTmp.y<rectMinY)
+      pointA.y=rectMinY;
+    else if(pointBTmp.y>rectMaxY)
+      pointA.y=rectMaxY;
+  }
+  
+      
   
 
   
