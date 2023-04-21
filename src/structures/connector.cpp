@@ -23,6 +23,9 @@ sf::Vector2f getIntersection(sf::Vector2f, sf::Vector2f, sf::Vector2f, sf::Vecto
 Connector::Connector(Box* start, Box* end){
   pointStart=start;
   pointEnd=end;
+
+  
+  positioningMode=1;
   updatePositions();
 
 }
@@ -31,80 +34,18 @@ Connector::~Connector(){}
 
 void Connector::updatePositions(){
 
+  sf::Vector2f pointA;
+  sf::Vector2f pointB;
   
   
-  
-  sf::Vector2f pointA=sf::Vector2f(pointStart->getX()+pointStart->getW()/2, pointStart->getY()+pointStart->getH()/2);
-  sf::Vector2f pointB=sf::Vector2f(pointEnd->getX()+pointEnd->getW()/2, pointEnd->getY()+pointEnd->getH()/2);
-  sf::Vector2f pointATmp=pointA;
-  sf::Vector2f pointBTmp=pointB;
-
-
-  
-  //Manage ending point
-  {
-    float rectMinX=pointEnd->getX();
-    float rectMinY=pointEnd->getY();
-    float rectMaxX=pointEnd->getX()+pointEnd->getW();
-    float rectMaxY=pointEnd->getY()+pointEnd->getH();
-
-    
-    float rectCenterX=pointEnd->getX()+pointEnd->getW()/2;
-    float rectCenterY=pointEnd->getY()+pointEnd->getH()/2;
-
-    bool didItHappen=false;
-
-    if(pointA.x<=rectCenterX)
-      pointB=getIntersection(pointA, pointB, sf::Vector2f(rectMinX, rectMinY), sf::Vector2f(rectMinX, rectMaxY), didItHappen);
-    else
-      pointB=getIntersection(pointA, pointB, sf::Vector2f(rectMaxX, rectMinY), sf::Vector2f(rectMaxX, rectMaxY), didItHappen);
-
-    if(didItHappen==false){
-      if(pointA.y<=rectCenterY)
-        pointB=getIntersection(pointA, pointBTmp, sf::Vector2f(rectMinX, rectMinY), sf::Vector2f(rectMaxX, rectMinY), didItHappen);
-      else
-        pointB=getIntersection(pointA, pointBTmp, sf::Vector2f(rectMinX, rectMaxY), sf::Vector2f(rectMaxX, rectMaxY), didItHappen);
-    }
-
-      //no intersections?? at least have the point on the box
-      if(didItHappen==false)
-        pointB=pointBTmp;
-    
+  switch(positioningMode){
+    case 0:
+      updatePositionsWacky(pointA, pointB);
+      break;
+    case 1:
+      updatePositionsClosest(pointA, pointB);
+      break;
   }
-  
-  //Manage starting point
-  {
-    float rectMinX=pointStart->getX();
-    float rectMinY=pointStart->getY();
-    float rectMaxX=pointStart->getX()+pointStart->getW();
-    float rectMaxY=pointStart->getY()+pointStart->getH();
-    
-    float rectCenterX=pointStart->getX()+pointStart->getW()/2;
-    float rectCenterY=pointStart->getY()+pointStart->getH()/2;
-
-    bool didItHappen=false;
-
-    if(pointBTmp.x<=rectCenterX)
-      pointA=getIntersection(pointA, pointBTmp, sf::Vector2f(rectMinX, rectMinY), sf::Vector2f(rectMinX, rectMaxY), didItHappen);
-    else
-      pointA=getIntersection(pointA, pointBTmp, sf::Vector2f(rectMaxX, rectMinY), sf::Vector2f(rectMaxX, rectMaxY), didItHappen);
-
-    if(didItHappen==false){
-      if(pointBTmp.y<=rectCenterY)
-        pointA=getIntersection(pointATmp, pointBTmp, sf::Vector2f(rectMinX, rectMinY), sf::Vector2f(rectMaxX, rectMinY), didItHappen);
-      else
-        pointA=getIntersection(pointATmp, pointBTmp, sf::Vector2f(rectMinX, rectMaxY), sf::Vector2f(rectMaxX, rectMaxY), didItHappen);
-    }
-
-
-      //no intersections?? at least have the point on the box
-      if(didItHappen==false)
-        pointA=pointATmp;
-  
-    
-  }
-  
-      
   
 
   
@@ -135,6 +76,124 @@ void Connector::updatePositions(){
 void Connector::draw(sf::RenderWindow& window){
   window.draw(line, 2, sf::Lines);
   window.draw(arrow, 3, sf::LinesStrip);
+}
+
+
+void Connector::updatePositionsWacky(sf::Vector2f& pointA, sf::Vector2f& pointB){
+  pointA=sf::Vector2f(pointStart->getX()+pointStart->getW()/2, pointStart->getY()+pointStart->getH()/2);
+  pointB=sf::Vector2f(pointEnd->getX()+pointEnd->getW()/2, pointEnd->getY()+pointEnd->getH()/2);
+
+    sf::Vector2f pointBTmp=pointB;
+
+
+    {
+      float rectMinX=pointEnd->getX();
+      float rectMinY=pointEnd->getY();
+      float rectMaxX=pointEnd->getX()+pointEnd->getW();
+      float rectMaxY=pointEnd->getY()+pointEnd->getH();
+
+      if(pointA.x<rectMinX)
+        pointB.x=rectMinX;
+      else if(pointA.x>rectMaxX)
+        pointB.x=rectMaxX;
+
+      if(pointA.y<rectMinY)
+        pointB.y=rectMinY;
+      else if(pointA.y>rectMaxY)
+        pointB.y=rectMaxY;
+    }
+
+    {
+      float rectMinX=pointStart->getX();
+      float rectMinY=pointStart->getY();
+      float rectMaxX=pointStart->getX()+pointStart->getW();
+      float rectMaxY=pointStart->getY()+pointStart->getH();
+
+      if(pointBTmp.x<rectMinX)
+        pointA.x=rectMinX;
+      else if(pointBTmp.x>rectMaxX)
+        pointA.x=rectMaxX;
+
+      if(pointBTmp.y<rectMinY)
+        pointA.y=rectMinY;
+      else if(pointBTmp.y>rectMaxY)
+        pointA.y=rectMaxY;
+    }
+}
+void Connector::updatePositionsClosest(sf::Vector2f& pointA, sf::Vector2f& pointB){
+
+
+  pointA=sf::Vector2f(pointStart->getX()+pointStart->getW()/2, pointStart->getY()+pointStart->getH()/2);
+  pointB=sf::Vector2f(pointEnd->getX()+pointEnd->getW()/2, pointEnd->getY()+pointEnd->getH()/2);
+  sf::Vector2f pointATmp=pointA;
+  sf::Vector2f pointBTmp=pointB;
+
+
+
+  //Manage ending point
+  {
+    float rectMinX=pointEnd->getX();
+    float rectMinY=pointEnd->getY();
+    float rectMaxX=pointEnd->getX()+pointEnd->getW();
+    float rectMaxY=pointEnd->getY()+pointEnd->getH();
+
+  
+    float rectCenterX=pointEnd->getX()+pointEnd->getW()/2;
+    float rectCenterY=pointEnd->getY()+pointEnd->getH()/2;
+
+    bool didItHappen=false;
+
+    if(pointA.x<=rectCenterX)
+      pointB=getIntersection(pointA, pointB, sf::Vector2f(rectMinX, rectMinY), sf::Vector2f(rectMinX, rectMaxY), didItHappen);
+    else
+      pointB=getIntersection(pointA, pointB, sf::Vector2f(rectMaxX, rectMinY), sf::Vector2f(rectMaxX, rectMaxY), didItHappen);
+
+    if(didItHappen==false){
+      if(pointA.y<=rectCenterY)
+        pointB=getIntersection(pointA, pointBTmp, sf::Vector2f(rectMinX, rectMinY), sf::Vector2f(rectMaxX, rectMinY), didItHappen);
+      else
+        pointB=getIntersection(pointA, pointBTmp, sf::Vector2f(rectMinX, rectMaxY), sf::Vector2f(rectMaxX, rectMaxY), didItHappen);
+    }
+
+      //no intersections?? at least have the point on the box
+      if(didItHappen==false)
+        pointB=pointBTmp;
+  
+  }
+
+  //Manage starting point
+  {
+    float rectMinX=pointStart->getX();
+    float rectMinY=pointStart->getY();
+    float rectMaxX=pointStart->getX()+pointStart->getW();
+    float rectMaxY=pointStart->getY()+pointStart->getH();
+  
+    float rectCenterX=pointStart->getX()+pointStart->getW()/2;
+    float rectCenterY=pointStart->getY()+pointStart->getH()/2;
+
+    bool didItHappen=false;
+
+    if(pointBTmp.x<=rectCenterX)
+      pointA=getIntersection(pointA, pointBTmp, sf::Vector2f(rectMinX, rectMinY), sf::Vector2f(rectMinX, rectMaxY), didItHappen);
+    else
+      pointA=getIntersection(pointA, pointBTmp, sf::Vector2f(rectMaxX, rectMinY), sf::Vector2f(rectMaxX, rectMaxY), didItHappen);
+
+    if(didItHappen==false){
+      if(pointBTmp.y<=rectCenterY)
+        pointA=getIntersection(pointATmp, pointBTmp, sf::Vector2f(rectMinX, rectMinY), sf::Vector2f(rectMaxX, rectMinY), didItHappen);
+      else
+        pointA=getIntersection(pointATmp, pointBTmp, sf::Vector2f(rectMinX, rectMaxY), sf::Vector2f(rectMaxX, rectMaxY), didItHappen);
+    }
+
+
+      //no intersections?? at least have the point on the box
+      if(didItHappen==false)
+        pointA=pointATmp;
+
+  
+  }
+
+    
 }
 
 
@@ -172,4 +231,7 @@ sf::Vector2f getIntersection(sf::Vector2f p1A, sf::Vector2f p2A, sf::Vector2f p1
   bool unused;
   return getIntersection(p1A, p2A, p1B, p2B, unused);
 }
+
+
+
 

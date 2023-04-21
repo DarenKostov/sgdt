@@ -21,9 +21,22 @@ class Connector : public Link{
   private:
     Box* pointStart;
     Box* pointEnd;
+
+    // shape
     sf::Vertex line[2];
-  
     sf::Vertex arrow[3];
+
+
+    // positioning mode
+    /*
+      0-wacky
+      1-closest that touches the border
+    */
+    int positioningMode;
+
+    //updates the point you give it with a specific algorythm
+    void updatePositionsWacky(sf::Vector2f&, sf::Vector2f&);
+    void updatePositionsClosest(sf::Vector2f&, sf::Vector2f&);
     
   public:
     Connector(Box*, Box*);
