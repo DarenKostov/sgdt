@@ -20,6 +20,9 @@ class MainGUIClass : public MainClass{
 
     //tells us we are editing text
     bool editingText;
+
+    //tells us if we are in the process of cutting links
+    bool cuttingLinks;
     
   public:
 
@@ -45,8 +48,22 @@ class MainGUIClass : public MainClass{
     //manages node selection, will select all or none, when apropriate
     void manageSelection();
 
-    //returns you what the mouse is hovering over (if you give it the mouse coords), if nothing returns nullptr
+
+
+    //==returns you what the mouse is hovering over (if you give it the mouse coords), if nothing returns nullptr
+    //Works with overlapping nodes!!! (ex: you use the non selected function on a overlapping selected and non seleceted node-> it retusr the non selected node)
+
+    //whatever you are hovering over
     Node* hoveringOver(float, float);
+
+    //whatever you are hovering as long as its not selected  
+    Node* hoveringOverNotSelected(float, float);
+
+    //whatever you are hovering as long as its not the main selected node  
+    Node* hoveringOverNotSelectedMain(float, float);
+  
+    //whatever you are hovering as long as its selected  
+    Node* hoveringOverSelected(float, float);
 
 
     //manages editing the contest of the selected node

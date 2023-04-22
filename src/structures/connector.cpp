@@ -32,6 +32,14 @@ Connector::Connector(Box* start, Box* end){
 Connector::~Connector(){}
 
 
+sf::Vector2f Connector::getStart(){
+  return line[0].position;
+}
+sf::Vector2f Connector::getEnd(){
+  return line[1].position;
+}
+
+
 void Connector::updatePositions(){
 
   sf::Vector2f pointA;

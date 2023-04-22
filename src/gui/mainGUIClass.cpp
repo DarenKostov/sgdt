@@ -12,11 +12,15 @@
 
 #include "mainGUIClass.h"
 #include <iostream>
+#include <cmath>
 #include "../structures/box.h"
 #include "../structures/connector.h"
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 
+
+//tells you wether or not a point intercects with a line, provide the point first the  the 2 points that make up the line
+bool doesItIntersect(sf::Vector2f, sf::Vector2f, sf::Vector2f);
 
 
 
@@ -164,7 +168,14 @@ void MainGUIClass::startProgram(){
               }
           
               if(event.mouseButton.button==sf::Mouse::Right){
-                selectedMainNode=hoveringOver(mousePos.x, mousePos.y);  
+                selectedMainNode=hoveringOver(mousePos.x, mousePos.y);
+
+                if(selectedMainNode==nullptr){
+                  cuttingLinks=true;
+                }else{
+                  cuttingLinks=false;
+                }
+              
               }
             }
                                   
@@ -172,8 +183,12 @@ void MainGUIClass::startProgram(){
           case sf::Event::MouseButtonReleased:
 
             if(event.mouseButton.button==sf::Mouse::Right){
+
+              cuttingLinks=false;
+            
               sf::Vector2f mousePos=window.mapPixelToCoords(sf::Mouse::getPosition(window), mapView);
-              auto connectTo=hoveringOver(mousePos.x, mousePos.y);
+
+              auto connectTo=hoveringOverNotSelectedMain(mousePos.x, mousePos.y);
 
               //we actually have to nodes to connect right?
               if(connectTo==nullptr) break;
@@ -197,58 +212,112 @@ void MainGUIClass::startProgram(){
             }
             break;
           case sf::Event::MouseMoved:
-          //==PAN
+
+          
             static sf::Vector2f oldPos;
-            static sf::Vector2f oldPosMapView;
+            static sf::Vector2f oldMapViewCenter;
+
             
             sf::Vector2f pos=window.mapPixelToCoords(sf::Mouse::getPosition(window), mapView);
 
+            //==PAN
             if(sf::Mouse::isButtonPressed(sf::Mouse::Middle)){
-          
-
-              sf::Vector2f newPos=-(pos-oldPos)+oldPosMapView;
-              mapView.setCenter(newPos);
+              sf::Vector2f newCenter=-(pos-oldPos)+oldMapViewCenter;
+              mapView.setCenter(newCenter);
+              break;
             }
 
             //move boxes
             if(sf::Mouse::isButtonPressed(sf::Mouse::Left)){
               
-              // sf::Vector2i shift=oldPos-pos;
               for(auto selectedNode : selectedNodes){
 
-                // selectedNode->move(shift.x*ZoomFactor, shift.y*ZoomFactor);
                 int newX=pos.x-oldPos.x+static_cast<Box*>(selectedNode)->prevXCoordinate;
                 int newY=pos.y-oldPos.y+static_cast<Box*>(selectedNode)->prevYCoordinate;
                 
                 selectedNode->setX(newX);
                 selectedNode->setY(newY);
 
-              //update the link positions
-              for(auto node : nodes){
-                //the links actually exist right? if so update them
-                if(links[selectedNode][node]!=nullptr)
-                  static_cast<Connector*>(links[selectedNode][node])->updatePositions();
-                if(links[node][selectedNode]!=nullptr)
-                  static_cast<Connector*>(links[node][selectedNode])->updatePositions();
-              }
+                //update the link positions
+                for(auto node : nodes){
+                  //the links actually exist right? if so update them
+                  if(links[selectedNode][node]!=nullptr)
+                    static_cast<Connector*>(links[selectedNode][node])->updatePositions();
+                  if(links[node][selectedNode]!=nullptr)
+                    static_cast<Connector*>(links[node][selectedNode])->updatePositions();
+                }
 
               
               }
-            
-            }else{
 
-              oldPos=window.mapPixelToCoords(sf::Mouse::getPosition(window), mapView);
-              oldPosMapView=mapView.getCenter();
-              for(auto node : nodes){
-                static_cast<Box*>(node)->updatePreviousCoordinates();
+              break;
+            }
+
+
+            //cut links
+            if(sf::Mouse::isButtonPressed(sf::Mouse::Right)){
+              if(cuttingLinks==true){
+                window.setView(mapView);
+                sf::CircleShape pointer;
+                pointer.setPosition(pos);
+                pointer.setRadius(5);
+                pointer.setFillColor(sf::Color(255, 0, 0, 255/2));
+                // window.draw(pointer);
+
+                pointer.setPosition(oldPos);
+                pointer.setFillColor(sf::Color(0, 255, 255, 255/2));
+                // window.draw(pointer);
+                window.display();
+
+                
+                sf::Vector2f newPos=window.mapPixelToCoords(sf::Mouse::getPosition(window), mapView);
+                
+                sf::Vertex line[3];
+                line[0]=sf::Vertex(oldPos);
+                line[1]=sf::Vertex(pos);
+                line[2]=sf::Vertex(newPos);
+
+                
+                window.draw(line, 3, sf::Lines);
+
+                for(auto& row : links) {
+                  auto& linksRow=row.second;
+                  auto x=row.first;
+                  for(auto& link : linksRow) {
+                    auto y=link.first;
+
+                    if(links[x][y]==nullptr)
+                      continue;
+
+                    //are we close enough to the link? if so delete it
+                    if(doesItIntersect(pos, static_cast<Connector*>(links[x][y])->getStart(), static_cast<Connector*>(links[x][y])->getEnd())){
+        
+                      std::cout << "Cutting Link!\n" << std::flush;
+                      delete links[x][y];
+                      links[x][y]=nullptr;
+                      break;
+                    }
+
+                  }
+                }
               }
+            }
+
+
+
+
+            //update old positions
+          
+            oldPos=pos;//window.mapPixelToCoords(sf::Mouse::getPosition(window), mapView);
+            oldMapViewCenter=mapView.getCenter();
+            for(auto node : nodes){
+              static_cast<Box*>(node)->updatePreviousCoordinates();
             }
 
           
 
-
-            
-            //resize a box
+                       
+              //resize a box
             if(sf::Mouse::isButtonPressed(sf::Mouse::Right)){
               if(selectedMainNode==nullptr || editingText==false) break;
 
@@ -378,15 +447,26 @@ void MainGUIClass::manageSelection(float mouseX, float mouseY){
   //single selection
   }else{
 
+    node=hoveringOverNotSelectedMain(mouseX, mouseY);
+    
+    std::cout << "single selection\n";
+
     selectedNodes.clear();
 
+    //we selected the selectedMainNode and there are no overlaps
+    if(node==nullptr){
+      selectedNodes.insert(selectedMainNode);
+      return;
+    }
+
     
-    if(selectedMainNode!=node)
-      stopEditContentOfNode();
+    stopEditContentOfNode();
+
+
+
     
     selectedMainNode=node;
     selectedNodes.insert(node);
-    std::cout << "single selection\n";
     return;
   }
 
@@ -458,3 +538,100 @@ Node* MainGUIClass::hoveringOver(float mouseX, float mouseY){
 
   return nullptr;
 }
+Node* MainGUIClass::hoveringOverSelected(float mouseX, float mouseY){
+      for(auto node : selectedNodes)
+        if(node->collidingWithCoords(mouseX, mouseY))
+          return node;
+
+  return nullptr;
+}
+Node* MainGUIClass::hoveringOverNotSelectedMain(float mouseX, float mouseY){
+      for(auto node : nodes){
+    
+        //is it the main selected node? skip it if so
+        if(node==selectedMainNode)
+          continue;
+    
+        if(node->collidingWithCoords(mouseX, mouseY))
+          return node;
+      }
+
+  return nullptr;
+}
+Node* MainGUIClass::hoveringOverNotSelected(float mouseX, float mouseY){
+      for(auto node : nodes){
+
+        //is it selected? skip it if so
+        if(selectedNodes.find(node)!=selectedNodes.end())
+          continue;
+    
+        if(node->collidingWithCoords(mouseX, mouseY))
+          return node;
+      }
+
+  return nullptr;
+}
+
+bool doesItIntersect(sf::Vector2f pointA, sf::Vector2f line1, sf::Vector2f line2){
+//                                p1B-p2B               p1A                 p2A                
+  
+
+  
+  //shift the cordinate system of the line to the 0, 0 of the point
+  line1-=pointA;
+  line2-=pointA;
+
+  //get m
+  float m=(line1.y-line2.y)/(line1.x-line2.x);
+
+  //find b
+  float b=-(m*line1.x-line1.y);
+
+  //get perpendicular m
+  float mPerpendicular=-1/m;
+
+  //find perpendicular b, (0, 0) is the center of the circle btw! no need for "+pointA.x-pointA.y"
+  float bPerpendicular=-mPerpendicular;
+
+
+  //find the iterception point between the perpendicular and original line
+
+  //some values for convenience    
+  float a1=m;
+  float b1=-1;
+  float c1=b;
+
+  float a2=mPerpendicular;
+  float b2=-1;
+  float c2=bPerpendicular;
+
+  float x, y;
+
+  //some complex math
+  x=(b1*c2-b2*c1)/(a1*b2-a2*b1);
+  y=(a2*c1-a1*c2)/(a1*b2-a2*b1);
+
+  line1+=pointA;
+  line2+=pointA;
+
+
+  sf::Vector2f pointB(x, y);
+
+  pointB+=pointA;
+
+  // is the point on the line at all? (this is a line segment)
+  if(pointB.x<std::min(line1.x,line2.x) || pointB.x>std::max(line1.x,line2.x) || pointB.y<std::min(line1.y,line2.y) || pointB.y>std::max(line1.y,line2.y))
+    return false;
+
+    
+  //find distance between intercection and our point
+  float distance=sqrt(pow(pointA.x-pointB.x, 2)+pow(pointA.y-pointB.y, 2));
+
+  
+  if(distance>5)
+    return false;
+
+  return true;
+
+}
+

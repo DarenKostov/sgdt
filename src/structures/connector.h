@@ -48,8 +48,12 @@ class Connector : public Link{
   
     // //setters
     // void setLabel(std::string);
-    // void setColor(char);
+    // void setColor(char);  
 
+    sf::Vector2f getStart();
+    sf::Vector2f getEnd();
+
+  
     void updatePositions();
 
     //draws itself on a RenderWindow

@@ -42,7 +42,7 @@ class MainClass{
     virtual void removeNode(Node*);
     virtual void addLink(Node*, Node*, Link*);
 
-    // virtual void removeLink();
+    // virtual void removeLink(Node*, Nodec);
   
 };
 
