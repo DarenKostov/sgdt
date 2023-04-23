@@ -19,8 +19,11 @@
 #include <SFML/Window.hpp>
 
 
-//tells you wether or not a point intercects with a line, provide the point first the  the 2 points that make up the line
+//tells you wether or not a point (5 px diameter circle) intercects with a line, provide the point first the  the 2 points that make up the line
 bool doesItIntersect(sf::Vector2f, sf::Vector2f, sf::Vector2f);
+
+//check if 2 lines intersect
+bool doesItIntersect(sf::Vector2f, sf::Vector2f, sf::Vector2f, sf::Vector2f);
 
 
 
@@ -80,7 +83,7 @@ void MainGUIClass::startProgram(){
 
   while (window.isOpen()){
     sf::Event event;
-
+    window.clear();
 
     
     while (window.pollEvent(event)){
@@ -203,37 +206,47 @@ void MainGUIClass::startProgram(){
             
             break;
           case sf::Event::Resized:
-
+            //if screen is resized mix the views dimensions
             {
               int windowWidth=event.size.width;
               int windowHeight=event.size.height;
               mapView.reset(sf::FloatRect(0.f, 0.f, windowWidth, windowHeight));
               UIView.reset(sf::FloatRect(0.f, 0.f, windowWidth, windowHeight));
             }
+          
             break;
           case sf::Event::MouseMoved:
 
           
-            static sf::Vector2f oldPos;
-            static sf::Vector2f oldMapViewCenter;
+            static sf::Vector2f oldMousePos=sf::Vector2f(0, 0);
+            static sf::Vector2f oldMapViewCenter=sf::Vector2f(0, 0);
 
             
-            sf::Vector2f pos=window.mapPixelToCoords(sf::Mouse::getPosition(window), mapView);
+            sf::Vector2f currentMousePos=window.mapPixelToCoords(sf::Mouse::getPosition(window), mapView);
 
-            //==PAN
+            //==PAN THE VIEW
             if(sf::Mouse::isButtonPressed(sf::Mouse::Middle)){
-              sf::Vector2f newCenter=-(pos-oldPos)+oldMapViewCenter;
+              sf::Vector2f newCenter=-(currentMousePos-oldMousePos)+oldMapViewCenter;
+              // std::cout << newCenter.x << " : " << newCenter.y << "\n";
+              // std::cout << currentMousePos.x << " : " << currentMousePos.y << " | ";
+
+              sf::Vector2i tmpMousePos=window.mapCoordsToPixel(oldMousePos, mapView);
               mapView.setCenter(newCenter);
+              oldMousePos=window.mapPixelToCoords(tmpMousePos, mapView);
+            
+              // currentMousePos=window.mapPixelToCoords(sf::Mouse::getPosition(window), mapView);
+              // std::cout << currentMousePos.x << " : " << currentMousePos.y << "\n";
+            
               break;
             }
 
-            //move boxes
+            //==MOVE BOXES
             if(sf::Mouse::isButtonPressed(sf::Mouse::Left)){
               
               for(auto selectedNode : selectedNodes){
 
-                int newX=pos.x-oldPos.x+static_cast<Box*>(selectedNode)->prevXCoordinate;
-                int newY=pos.y-oldPos.y+static_cast<Box*>(selectedNode)->prevYCoordinate;
+                int newX=currentMousePos.x-oldMousePos.x+static_cast<Box*>(selectedNode)->prevXCoordinate;
+                int newY=currentMousePos.y-oldMousePos.y+static_cast<Box*>(selectedNode)->prevYCoordinate;
                 
                 selectedNode->setX(newX);
                 selectedNode->setY(newY);
@@ -254,31 +267,24 @@ void MainGUIClass::startProgram(){
             }
 
 
-            //cut links
-            if(sf::Mouse::isButtonPressed(sf::Mouse::Right)){
-              if(cuttingLinks==true){
+            //==CUT LINKS
+            if(cuttingLinks==true){
+              if(sf::Mouse::isButtonPressed(sf::Mouse::Right)){
+
                 window.setView(mapView);
-                sf::CircleShape pointer;
-                pointer.setPosition(pos);
-                pointer.setRadius(5);
-                pointer.setFillColor(sf::Color(255, 0, 0, 255/2));
-                // window.draw(pointer);
+                sf::Vertex line[2];
 
-                pointer.setPosition(oldPos);
-                pointer.setFillColor(sf::Color(0, 255, 255, 255/2));
-                // window.draw(pointer);
-                window.display();
-
-                
-                sf::Vector2f newPos=window.mapPixelToCoords(sf::Mouse::getPosition(window), mapView);
-                
-                sf::Vertex line[3];
-                line[0]=sf::Vertex(oldPos);
-                line[1]=sf::Vertex(pos);
-                line[2]=sf::Vertex(newPos);
-
-                
-                window.draw(line, 3, sf::Lines);
+                float x, y;
+                sf::Vector2f difference=oldMousePos-currentMousePos;
+                // difference.x*=10;
+                // difference.y*=10;
+              
+                line[0]=sf::Vertex(oldMousePos+difference);
+                line[1]=sf::Vertex(currentMousePos-difference);
+              
+              
+                window.draw(line, 2, sf::Lines);
+                // window.display();
 
                 for(auto& row : links) {
                   auto& linksRow=row.second;
@@ -289,8 +295,10 @@ void MainGUIClass::startProgram(){
                     if(links[x][y]==nullptr)
                       continue;
 
-                    //are we close enough to the link? if so delete it
-                    if(doesItIntersect(pos, static_cast<Connector*>(links[x][y])->getStart(), static_cast<Connector*>(links[x][y])->getEnd())){
+                    // //are we close enough to the link? if so delete it
+                    // if(doesItIntersect(currentMousePos, static_cast<Connector*>(links[x][y])->getStart(), static_cast<Connector*>(links[x][y])->getEnd())){
+                    //do we slash the link in 2?
+                    if(doesItIntersect(currentMousePos, oldMousePos, static_cast<Connector*>(links[x][y])->getStart(), static_cast<Connector*>(links[x][y])->getEnd())){
         
                       std::cout << "Cutting Link!\n" << std::flush;
                       delete links[x][y];
@@ -304,11 +312,33 @@ void MainGUIClass::startProgram(){
             }
 
 
+            //==RESIZE BOXES
+            if(sf::Mouse::isButtonPressed(sf::Mouse::Right)){
+
+              //we have a main node selected and we are in editing mode, right?
+              if(!(selectedMainNode==nullptr || editingText==false)){;
+           
+                int newWidth=currentMousePos.x-selectedMainNode->getX();
+                int newHeight=currentMousePos.y-selectedMainNode->getY();
+
+                selectedMainNode->setW(newWidth);
+                selectedMainNode->setH(newHeight);
+
+                //update the link positions
+                for(auto node : nodes){
+                  //the links actually exist right? if so update them
+                  if(links[selectedMainNode][node]!=nullptr)
+                    static_cast<Connector*>(links[selectedMainNode][node])->updatePositions();
+                  if(links[node][selectedMainNode]!=nullptr)
+                    static_cast<Connector*>(links[node][selectedMainNode])->updatePositions();
+                }
+              }
+            }
 
 
             //update old positions
           
-            oldPos=pos;//window.mapPixelToCoords(sf::Mouse::getPosition(window), mapView);
+            oldMousePos=currentMousePos;
             oldMapViewCenter=mapView.getCenter();
             for(auto node : nodes){
               static_cast<Box*>(node)->updatePreviousCoordinates();
@@ -317,33 +347,10 @@ void MainGUIClass::startProgram(){
           
 
                        
-              //resize a box
-            if(sf::Mouse::isButtonPressed(sf::Mouse::Right)){
-              if(selectedMainNode==nullptr || editingText==false) break;
-
-            
-              int newWidth=pos.x-selectedMainNode->getX();
-              int newHeight=pos.y-selectedMainNode->getY();
-
-              selectedMainNode->setW(newWidth);
-              selectedMainNode->setH(newHeight);
-
-              //update the link positions
-              for(auto node : nodes){
-                //the links actually exist right? if so update them
-                if(links[selectedMainNode][node]!=nullptr)
-                  static_cast<Connector*>(links[selectedMainNode][node])->updatePositions();
-                if(links[node][selectedMainNode]!=nullptr)
-                  static_cast<Connector*>(links[node][selectedMainNode])->updatePositions();
-              }
-
-            
-            }
           break;
         }
     }
 
-    window.clear();
 
     window.setView(mapView);
     //draw highlights
@@ -635,3 +642,30 @@ bool doesItIntersect(sf::Vector2f pointA, sf::Vector2f line1, sf::Vector2f line2
 
 }
 
+// https://flassari.is/2008/11/line-line-intersection-in-cplusplus/
+bool doesItIntersect(sf::Vector2f pointA1, sf::Vector2f pointA2, sf::Vector2f pointB1, sf::Vector2f pointB2){
+
+    double determinant=(pointA1.x-pointA2.x)*(pointB1.y-pointB2.y)-(pointA1.y-pointA2.y)*(pointB1.x-pointB2.x);
+
+
+    //does the point exist?
+    if(determinant==0){
+      return false;
+    }
+
+  
+    double pre=(pointA1.x*pointA2.y-pointA1.y*pointA2.x);
+    double post=(pointB1.x*pointB2.y-pointB1.y*pointB2.x);
+    double x=(pre*(pointB1.x-pointB2.x)-(pointA1.x-pointA2.x)*post)/determinant;
+    double y=(pre*(pointB1.y-pointB2.y)-(pointA1.y-pointA2.y)*post)/determinant;
+
+  
+    //is the point within the ends of each line?
+    if(x<std::min(pointA1.x,pointA2.x) || x>std::max(pointA1.x,pointA2.x) || x<std::min(pointB1.x,pointB2.x) || x>std::max(pointB1.x,pointB2.x))
+      return false;
+    if(y<std::min(pointA1.y,pointA2.y) || y>std::max(pointA1.y,pointA2.y) || y<std::min(pointB1.y,pointB2.y) || y>std::max(pointB1.y,pointB2.y))
+      return false;
+
+    return true;
+
+}
