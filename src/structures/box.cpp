@@ -13,7 +13,8 @@
 Box::Box(int x, int y, int w, int h, sf::Font& font): Node(x, y, w, h){
   prevXCoordinate=x;
   prevYCoordinate=y;
-
+  lineThickness=2;
+  
   body=sf::RectangleShape();
   
   body.setPosition(x, y);
@@ -21,7 +22,17 @@ Box::Box(int x, int y, int w, int h, sf::Font& font): Node(x, y, w, h){
 
   body.setOutlineColor(sf::Color::White);
   body.setFillColor(sf::Color::Transparent);
-  body.setOutlineThickness(2);
+
+  
+  body.setOutlineThickness(lineThickness);
+  
+  
+  outerBody=body;
+  outerBody.setOutlineThickness(lineThickness*3);
+
+  outerBody.move(lineThickness, lineThickness);
+  outerBody.setSize(sf::Vector2f(w-lineThickness*2, h-lineThickness*2));
+  
 
   contentText.setString(content);
   contentText.setCharacterSize(20);
@@ -47,21 +58,25 @@ void Box::updatePreviousCoordinates(){
 void Box::setX(int in){
   XCoordinate=in;
   body.setPosition(in, YCoordinate);
+  outerBody.setPosition(in+lineThickness, YCoordinate+lineThickness);
   updateContentProperties();
 }
 void Box::setY(int in){
   YCoordinate=in;
   body.setPosition(XCoordinate, in);
+  outerBody.setPosition(XCoordinate+lineThickness, in+lineThickness);
   updateContentProperties();
 }
 void Box::setW(int in){
   Width=in;
   body.setSize(sf::Vector2f(in, Height));
+  outerBody.setSize(sf::Vector2f(in-lineThickness*2, Height-lineThickness*2));
   updateContentProperties();
 }
 void Box::setH(int in){
   Height=in;
   body.setSize(sf::Vector2f(Width, in));
+  outerBody.setSize(sf::Vector2f(Width-lineThickness*2, in-lineThickness*2));
   updateContentProperties();
 }
 
@@ -114,5 +129,18 @@ void Box::updateContentProperties(){
 void Box::draw(sf::RenderWindow& window){
   window.draw(body);
   window.draw(contentText);
+}
+
+void Box::drawHighlight(sf::RenderWindow& window){
+  outerBody.setOutlineColor(sf::Color(255, 66, 0, 255));
+  window.draw(outerBody);
+}
+void Box::drawSelected(sf::RenderWindow& window){
+  outerBody.setOutlineColor(sf::Color(255, 162, 0, 255));
+  window.draw(outerBody);
+}
+void Box::drawHovered(sf::RenderWindow& window){
+  outerBody.setOutlineColor(sf::Color(0, 162, 255, 255));
+  window.draw(outerBody);
 }
 

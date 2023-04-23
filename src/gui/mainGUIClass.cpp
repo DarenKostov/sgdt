@@ -172,11 +172,14 @@ void MainGUIClass::startProgram(){
           
               if(event.mouseButton.button==sf::Mouse::Right){
                 selectedMainNode=hoveringOver(mousePos.x, mousePos.y);
-
+                
                 if(selectedMainNode==nullptr){
+                  //cutting links
                   cuttingLinks=true;
                 }else{
+                  //creating links
                   cuttingLinks=false;
+                  selectedNodes.insert(selectedMainNode);
                 }
               
               }
@@ -193,7 +196,7 @@ void MainGUIClass::startProgram(){
 
               auto connectTo=hoveringOverNotSelectedMain(mousePos.x, mousePos.y);
 
-              //we actually have to nodes to connect right?
+              //we actually have nodes to connect right?
               if(connectTo==nullptr) break;
               if(selectedMainNode==nullptr) break;
 
@@ -227,15 +230,11 @@ void MainGUIClass::startProgram(){
             //==PAN THE VIEW
             if(sf::Mouse::isButtonPressed(sf::Mouse::Middle)){
               sf::Vector2f newCenter=-(currentMousePos-oldMousePos)+oldMapViewCenter;
-              // std::cout << newCenter.x << " : " << newCenter.y << "\n";
-              // std::cout << currentMousePos.x << " : " << currentMousePos.y << " | ";
 
               sf::Vector2i tmpMousePos=window.mapCoordsToPixel(oldMousePos, mapView);
               mapView.setCenter(newCenter);
               oldMousePos=window.mapPixelToCoords(tmpMousePos, mapView);
             
-              // currentMousePos=window.mapPixelToCoords(sf::Mouse::getPosition(window), mapView);
-              // std::cout << currentMousePos.x << " : " << currentMousePos.y << "\n";
             
               break;
             }
@@ -276,8 +275,6 @@ void MainGUIClass::startProgram(){
 
                 float x, y;
                 sf::Vector2f difference=oldMousePos-currentMousePos;
-                // difference.x*=10;
-                // difference.y*=10;
               
                 line[0]=sf::Vertex(oldMousePos+difference);
                 line[1]=sf::Vertex(currentMousePos-difference);
@@ -295,8 +292,6 @@ void MainGUIClass::startProgram(){
                     if(links[x][y]==nullptr)
                       continue;
 
-                    // //are we close enough to the link? if so delete it
-                    // if(doesItIntersect(currentMousePos, static_cast<Connector*>(links[x][y])->getStart(), static_cast<Connector*>(links[x][y])->getEnd())){
                     //do we slash the link in 2?
                     if(doesItIntersect(currentMousePos, oldMousePos, static_cast<Connector*>(links[x][y])->getStart(), static_cast<Connector*>(links[x][y])->getEnd())){
         
@@ -309,9 +304,16 @@ void MainGUIClass::startProgram(){
                   }
                 }
               }
+            //==WE ARE ABOUT TO MAKE A LINK
+            }else{
+
+
+              //main selected excluded beacuse thats how the single selection works as well as node linking
+              HoveredNode=hoveringOverNotSelectedMain(currentMousePos.x, currentMousePos.y);
             }
 
 
+          
             //==RESIZE BOXES
             if(sf::Mouse::isButtonPressed(sf::Mouse::Right)){
 
@@ -353,24 +355,29 @@ void MainGUIClass::startProgram(){
 
 
     window.setView(mapView);
-    //draw highlights
+
+    
+    //==DRAW HIGHLIGHTS
     for(auto selectedNode : selectedNodes){
-      auto tmpNodeRecoloring=static_cast<Box*>(selectedNode)->getBody();      
-      tmpNodeRecoloring.setFillColor(sf::Color(255, 66, 0, 100));
-
-      //the main selected node has a different color
-      if(selectedNode==selectedMainNode)
-        tmpNodeRecoloring.setFillColor(sf::Color(255, 162, 0, 100));
-      
-      window.draw(tmpNodeRecoloring);
+      if(selectedMainNode!=selectedNode && selectedNode!=HoveredNode)
+        static_cast<Box*>(selectedNode)->drawHighlight(window);
     }
+    
+    if(nullptr!=HoveredNode)
+      static_cast<Box*>(HoveredNode)->drawHovered(window);
+    //the main selected node takes precedence
+    if(selectedMainNode!=nullptr)
+      static_cast<Box*>(selectedMainNode)->drawSelected(window);
+    
 
-    //draw actual bodies
+
+
+    //==DRAW ACTUAL BODIES
     for(auto node : nodes){
       static_cast<Box*>(node)->draw(window);
     }
 
-    //draw links
+    //==DRAW LINKS
     for(auto& row : links) {
       auto& linksRow=row.second;
       auto x=row.first;
@@ -415,17 +422,13 @@ void MainGUIClass::manageSelection(float mouseX, float mouseY){
   auto node=hoveringOver(mouseX, mouseY);
 
 
-  //clear selection if we did not click on a node
-  if(node==nullptr){
-    selectedNodes.clear();
-    stopEditContentOfNode();
-    selectedMainNode=nullptr;;
-    return;
-  }
   
-  //selection addition
+  //=SELECTION ADDITION
   if(sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)){
 
+    //what are we selecting? if it doesnt exist return
+    if(node==nullptr)
+      return;
 
       
     if(selectedMainNode!=node)
@@ -438,9 +441,13 @@ void MainGUIClass::manageSelection(float mouseX, float mouseY){
     return;
 
   
-  //selection removal
+  //=SELECTION REMOVAL
   }else if(sf::Keyboard::isKeyPressed(sf::Keyboard::LControl)){
 
+    //what are we removing? if it doesnt exist return
+    if(node==nullptr)
+      return;
+    
     if(selectedMainNode==node){
       stopEditContentOfNode();
       selectedMainNode=nullptr;
@@ -451,10 +458,21 @@ void MainGUIClass::manageSelection(float mouseX, float mouseY){
     return;
     
 
-  //single selection
+  //=SINGLE SELECTION
   }else{
 
+
+    //clear selection if we did not click on a node
+    if(node==nullptr){
+      selectedNodes.clear();
+      stopEditContentOfNode();
+      selectedMainNode=nullptr;;
+      return;
+    }
+
+
     node=hoveringOverNotSelectedMain(mouseX, mouseY);
+
     
     std::cout << "single selection\n";
 
@@ -474,6 +492,10 @@ void MainGUIClass::manageSelection(float mouseX, float mouseY){
     
     selectedMainNode=node;
     selectedNodes.insert(node);
+    
+    // update the hovering accordingly
+    HoveredNode=hoveringOverNotSelectedMain(mouseX, mouseY);
+    
     return;
   }
 

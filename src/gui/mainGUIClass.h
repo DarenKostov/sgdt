@@ -14,9 +14,15 @@
 class MainGUIClass : public MainClass{
 
   protected:
-    //variables:
+
+    //selected nodes, self explanatory
     std::set<Node*> selectedNodes;
+
+    //the selected node that we are currently working with
     Node* selectedMainNode;
+
+    //this is a helper variable and will not be used a lot
+    Node* HoveredNode;
 
     //tells us we are editing text
     bool editingText;
@@ -51,7 +57,7 @@ class MainGUIClass : public MainClass{
 
 
     //==returns you what the mouse is hovering over (if you give it the mouse coords), if nothing returns nullptr
-    //Works with overlapping nodes!!! (ex: you use the non selected function on a overlapping selected and non seleceted node-> it retusr the non selected node)
+    //Works with overlapping nodes!!! (ex: you use the non selected function on a overlapping selected and non seleceted node-> it returns the non selected node)
 
     //whatever you are hovering over
     Node* hoveringOver(float, float);

@@ -19,6 +19,7 @@ class Box : public Node, public GUIElement{
 
   private:
     sf::RectangleShape body;
+    sf::RectangleShape outerBody;
     sf::Text contentText;
 
     //updates the postion and size of the content text
@@ -55,6 +56,9 @@ class Box : public Node, public GUIElement{
 
     //draws itself on a RenderWindow
     void draw(sf::RenderWindow&);
+    void drawHighlight(sf::RenderWindow&);
+    void drawSelected(sf::RenderWindow&);
+    void drawHovered(sf::RenderWindow&);
 
   
 };
