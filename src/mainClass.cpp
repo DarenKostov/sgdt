@@ -19,6 +19,7 @@
 MainClass::MainClass(){
 
   pathToWorkingFile="";
+  haveWeMadeAnyChanges=false;
 }
 MainClass::~MainClass(){
     std::cout << "Main class deleting\n";
@@ -51,6 +52,7 @@ void MainClass::startProgram(){
 
 
 void MainClass::addNode(Node* in){
+  haveWeMadeAnyChanges=true;
   nodes.insert(in);
 
   /*add to the 2d table
@@ -107,6 +109,8 @@ void MainClass::addNode(Node* in){
 }
 
 void MainClass::removeNode(Node* in){
+  haveWeMadeAnyChanges=true;
+  
   nodes.erase(in);
 
 
@@ -131,6 +135,7 @@ void MainClass::removeNode(Node* in){
 }
 
 void MainClass::addLink(Node* from, Node* to, Link* in){
+  haveWeMadeAnyChanges=true;
   
   //all of the inputs exist right?
   if(from==nullptr) return;
@@ -152,6 +157,7 @@ void MainClass::addLink(Node* from, Node* to, Link* in){
 
 
 int MainClass::saveToFile(std::string path){
+  haveWeMadeAnyChanges=false;
   std::fstream file;
   
   file.open(path, std::fstream::in | std::fstream::out | std::ios::trunc);

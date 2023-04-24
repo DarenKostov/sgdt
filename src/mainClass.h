@@ -27,7 +27,12 @@ class MainClass{
 
     //the path to the file we opened, are working with;
     std::string pathToWorkingFile;
-  
+
+
+    //tells us if we have made any changes since last save
+    bool haveWeMadeAnyChanges;
+
+    
   public:
 
     

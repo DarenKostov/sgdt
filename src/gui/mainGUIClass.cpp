@@ -260,16 +260,18 @@ void MainGUIClass::performTerminalModeOutput(){
   std::vector<std::string> command=terminal.returnCommandHistory().back();
 
 
-  /*
-    0- success
-    1- failuare
-    2- where file? (file is unspecified)
-  */
-  int returnCode=9999;
 
 
   //==WRITING
   if(command[0]=="w"){
+    /*
+      0- success
+      1- failuare
+      2- where file? (file is unspecified)
+    */
+    int returnCode=9999;
+
+    
     if(command.size()!=1){
       pathToWorkingFile=command[1];
     }
@@ -296,7 +298,99 @@ void MainGUIClass::performTerminalModeOutput(){
 
   //==QUIT
   if(command[0]=="q"){
+    std::cout << (haveWeMadeAnyChanges? "True" : "False") << "\n";
+    if(haveWeMadeAnyChanges==true){
+        startNotification("You have unsaved data. Run :q! to force quit.");
+        return;
+    }
+    window.close();
+    return;
   }
+
+  if(command[0]=="q!"){
+    window.close();
+    return;
+  }
+
+
+  //==WRITE-QUIT
+  if(command[0]=="wq"){
+    /*
+      0- success
+      1- failuare
+      2- where file? (file is unspecified)
+    */
+    int returnCode=9999;
+
+    
+    if(command.size()!=1){
+      pathToWorkingFile=command[1];
+    }
+      
+    if(pathToWorkingFile==""){
+      returnCode=2;
+    }else{
+      returnCode=saveToFile(pathToWorkingFile);
+    }
+
+    switch(returnCode){
+      case 0:
+        startNotification("File saved to "+pathToWorkingFile+".");
+        window.close();
+        break;
+      case 1:
+        startNotification("An error occured, try again.");
+        break;
+      case 2:
+        startNotification("Unspecified file.");
+        break;
+    }
+    return;
+  }
+
+
+  //==WRITE-QUIT (but better)
+  if(command[0]=="x"){
+
+    if(haveWeMadeAnyChanges==false){
+      window.close();
+      return;
+    }
+    
+    /*
+      0- success
+      1- failuare
+      2- where file? (file is unspecified)
+    */
+    int returnCode=9999;
+    
+    if(command.size()!=1){
+      pathToWorkingFile=command[1];
+    }
+      
+    if(pathToWorkingFile==""){
+      returnCode=2;
+    }else{
+      returnCode=saveToFile(pathToWorkingFile);
+    }
+
+    switch(returnCode){
+      case 0:
+        startNotification("File saved to "+pathToWorkingFile+".");
+        window.close();
+        break;
+      case 1:
+        startNotification("An error occured, try again.");
+        break;
+      case 2:
+        startNotification("Unspecified file.");
+        break;
+    }
+    return;
+  }
+
+
+
   
   return;
 }
@@ -471,6 +565,7 @@ void MainGUIClass::performUIAction(){
 
               //update the link positions
               for(auto node : nodes){
+                haveWeMadeAnyChanges=true;
                 //the links actually exist right? if so update them
                 if(links[selectedNode][node]!=nullptr)
                   static_cast<Connector*>(links[selectedNode][node])->updatePositions();
@@ -513,6 +608,7 @@ void MainGUIClass::performUIAction(){
 
                   //do we slash the link in 2?
                   if(doesItIntersect(currentMousePos, oldMousePos, static_cast<Connector*>(links[x][y])->getStart(), static_cast<Connector*>(links[x][y])->getEnd())){
+                    haveWeMadeAnyChanges=true;
     
                     std::cout << "Cutting Link!\n" << std::flush;
                     delete links[x][y];
@@ -538,7 +634,8 @@ void MainGUIClass::performUIAction(){
 
             //we have a main node selected and we are in editing mode, right?
             if(!(selectedMainNode==nullptr || editingText==false)){;
-       
+              haveWeMadeAnyChanges=true;
+            
               int newWidth=currentMousePos.x-selectedMainNode->getX();
               int newHeight=currentMousePos.y-selectedMainNode->getY();
 
