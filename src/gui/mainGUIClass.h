@@ -6,8 +6,8 @@
 */
 
 #include "../mainClass.h"
-// #include "../structures/box.h" // no SFML for CLI-only compatible builds
-// #include <SFML/Graphics.hpp> // no SFML for CLI-only compatible builds
+#include "../structures/box.h"
+#include <SFML/Graphics.hpp>
 #include <vector>
 #include <set>
 
@@ -30,7 +30,25 @@ class MainGUIClass : public MainClass{
     //tells us if we are in the process of cutting links
     bool cuttingLinks;
 
+    //tells us if we are in terminal mode or GUI mode
     bool terminalMode;
+
+    //the window we will be drawwing on/using
+    sf::RenderWindow window;
+
+    //Views
+    sf::View mapView;
+    sf::View UIView;
+
+    //the font used
+    sf::Font TheFontWeAreUsing;
+
+    //how much have we zoomed
+    double ZoomFactor=1;
+
+    //global clock
+    sf::Clock clock;
+  
     
   public:
 
@@ -51,7 +69,7 @@ class MainGUIClass : public MainClass{
     //GUI management functions
       
     //manage node selection, give it the coords of the mouse IN the world
-    void manageSelection(float, float);
+    void manageSelection(sf::Vector2f);
     
     //manages node selection, will select all or none, when apropriate
     void manageSelection();
@@ -62,13 +80,13 @@ class MainGUIClass : public MainClass{
     //Works with overlapping nodes!!! (ex: you use the non selected function on a overlapping selected and non seleceted node-> it returns the non selected node)
 
     //whatever you are hovering over
-    Node* hoveringOver(float, float);
+    Node* hoveringOver(sf::Vector2f);
     //whatever you are hovering as long as its not selected  
-    Node* hoveringOverNotSelected(float, float);
+    Node* hoveringOverNotSelected(sf::Vector2f);
     //whatever you are hovering as long as its not the main selected node  
-    Node* hoveringOverNotSelectedMain(float, float);  
+    Node* hoveringOverNotSelectedMain(sf::Vector2f);  
     //whatever you are hovering as long as its selected  
-    Node* hoveringOverSelected(float, float);
+    Node* hoveringOverSelected(sf::Vector2f);
 
 
 
@@ -76,13 +94,13 @@ class MainGUIClass : public MainClass{
     //edits the input in terminal mode
     void performTerminalModeInput(uint32_t);
     //performs actions depending on the output in terminal mode
-    void performTerminalModeOutput(uint32_t);
+    void performTerminalModeOutput();
 
 
-    //these perform the actions of the terminal or UI
+    //these perform the actions of the terminal or GUI
     //give it a sf::RenderWindow, it uses void* because this file has to not include sfml
-    void performTerminalActions(void*);
-    void performUIAction(void*);
+    void performTerminalActions();
+    void performUIAction();
 
     
     //manages editing the contest of the selected node

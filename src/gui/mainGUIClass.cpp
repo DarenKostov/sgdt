@@ -34,11 +34,38 @@ MainGUIClass::MainGUIClass(){
 
   selectedMainNode=nullptr;
   HoveredNode=nullptr;
+
+
+  int mapX=12;  int mapY=12;
+
+  //create the window
+  window.create(sf::VideoMode(mapX, mapY), "sgdt- Simple Graphing/Diagramming Tool");
+
+  mapView=sf::View(sf::FloatRect(0, 0, mapX, mapY));
+  UIView=sf::View(sf::FloatRect(0, 0, mapX, mapY));
+
+  //set ratios
+  mapView.setViewport(sf::FloatRect(0, 0, 1, 1));
+  UIView.setViewport(sf::FloatRect(0, 0, 1, 1));
+  
+  window.setView(mapView);
+
+
+  //load font
+  if(!TheFontWeAreUsing.loadFromFile("fonts/UbuntuMono-Regular.ttf"))
+    std::cout << "fornt error\n";
+
+  //how much have we zoomed (default is 1, aka we havent zoomed at all)
+  ZoomFactor=1;
+
+
+  
 }
 MainGUIClass::~MainGUIClass(){
   std::cout << "GUI class deleting\n";
 
 }
+
 void MainGUIClass::removeNode(Node* in){
   if(in==nullptr) return;
 
@@ -54,320 +81,29 @@ void MainGUIClass::removeNode(Node* in){
 
 void MainGUIClass::startProgram(){
 
-  int mapX=12;  int mapY=12;
-  
-  sf::RenderWindow window(sf::VideoMode(mapX, mapY), "map");
-
-  sf::View mapView(sf::FloatRect(0, 0, mapX, mapY));
-  sf::View UIView(sf::FloatRect(0, 0, mapX, mapY));
-
-  //set ratios
-  mapView.setViewport(sf::FloatRect(0, 0, 1, 1));
-  UIView.setViewport(sf::FloatRect(0, 0, 1, 1));
-  
-  window.setView(mapView);
-
-
-  //load font
-  sf::Font ubuntuFont;
-  if(!ubuntuFont.loadFromFile("fonts/UbuntuMono-Regular.ttf"))
-    std::cout << "fornt error\n";
-
-  //how much have we zoomed
-  double ZoomFactor=1;
 
 
   //stats setup
   sf::Text stats;
   stats.setCharacterSize(10);
-  stats.setFont(ubuntuFont);
+  stats.setFont(TheFontWeAreUsing);
   stats.setFillColor(sf::Color::White);
   stats.setPosition(1, 100);
 
 
 
   while(window.isOpen()){
-    sf::Event event;
     window.clear();
 
-    if(terminalMode==true){
-      while (window.pollEvent(event)){
-        if(event.type==sf::Event::TextEntered){
 
-          break;
-        }
-      }
-    continue;
+
+    if(terminalMode==true){
+      performTerminalActions();
+    }else{
+      performUIAction();
     }
       
     
-    while(window.pollEvent(event)){
-
-        switch(event.type){
-          case sf::Event::Closed:
-            window.close();
-            break;
-       
-          case sf::Event::MouseWheelMoved:
-            //==ZOOM
-            {
-              double zoomAddition=1-1.0*event.mouseWheel.delta/10;
-              ZoomFactor*=zoomAddition;
-              mapView.zoom(zoomAddition);
-            }
-          
-            break;
-
-          case sf::Event::KeyPressed:
-           
-            //set up editing mode
-            if(event.key.code==sf::Keyboard::Enter && selectedMainNode!=nullptr){
-              if(editingText){
-                stopEditContentOfNode();
-              }else{
-                startEditContentOfNode();            
-              }
-            }
-
-            //we are diting text, dont take keys as command input
-            if(editingText==true)
-              break;
-
-            
-          
-            manageSelection();
-
-            break;
-
-
-
-
-
-
-
-          case sf::Event::TextEntered:
-            if(editingText==true){
-              editContentOfNode(event.text.unicode);
-              std::cout << "editing!!!\n";
-            }
-            break;
-            
-        
-        
-          case sf::Event::KeyReleased:
-          
-            //we are diting text, dont take keys as command input
-            if(editingText==true)
-              break;
-
-            if(event.key.code==sf::Keyboard::A && !sf::Keyboard::isKeyPressed(sf::Keyboard::LControl)){
-              sf::Vector2f pos=window.mapPixelToCoords(sf::Mouse::getPosition(window), mapView);
-              addNode(new Box((int)pos.x-50, (int)pos.y-25, 100, 50, ubuntuFont));
-            }else if(event.key.code==sf::Keyboard::D || event.key.code==sf::Keyboard::Delete || event.key.code==sf::Keyboard::Backspace){
-
-              while(!selectedNodes.empty())
-                removeNode(*selectedNodes.begin());
-            
-              // for(auto node : selectedNodes)
-              //   removeNode(node);
-             
-          
-            }
-          
-            break;
-          case sf::Event::MouseButtonPressed:
-
-            {
-              sf::Vector2f mousePos=window.mapPixelToCoords(sf::Mouse::getPosition(window), mapView);
-
-              //=Manage the selection
-              if(event.mouseButton.button==sf::Mouse::Left){
-                manageSelection(mousePos.x, mousePos.y);
-              }
-          
-              if(event.mouseButton.button==sf::Mouse::Right){
-                selectedMainNode=hoveringOver(mousePos.x, mousePos.y);
-                
-                if(selectedMainNode==nullptr){
-                  //cutting links
-                  cuttingLinks=true;
-                }else{
-                  //creating links
-                  cuttingLinks=false;
-                  selectedNodes.insert(selectedMainNode);
-                }
-              
-              }
-            }
-                                  
-            break;
-          case sf::Event::MouseButtonReleased:
-
-            if(event.mouseButton.button==sf::Mouse::Right){
-
-              cuttingLinks=false;
-            
-              sf::Vector2f mousePos=window.mapPixelToCoords(sf::Mouse::getPosition(window), mapView);
-
-              auto connectTo=hoveringOverNotSelectedMain(mousePos.x, mousePos.y);
-
-              //we actually have nodes to connect right?
-              if(connectTo==nullptr) break;
-              if(selectedMainNode==nullptr) break;
-
-            
-              addLink(selectedMainNode, connectTo, new Connector(static_cast<Box*>(selectedMainNode), static_cast<Box*>(connectTo)));
-              selectedMainNode=nullptr;  
-            }
-
-
-            
-            break;
-          case sf::Event::Resized:
-            //if screen is resized mix the views dimensions
-            {
-              int windowWidth=event.size.width;
-              int windowHeight=event.size.height;
-              mapView.reset(sf::FloatRect(0.f, 0.f, windowWidth, windowHeight));
-              UIView.reset(sf::FloatRect(0.f, 0.f, windowWidth, windowHeight));
-            }
-          
-            break;
-          case sf::Event::MouseMoved:
-
-          
-            static sf::Vector2f oldMousePos=sf::Vector2f(0, 0);
-            static sf::Vector2f oldMapViewCenter=sf::Vector2f(0, 0);
-
-            
-            sf::Vector2f currentMousePos=window.mapPixelToCoords(sf::Mouse::getPosition(window), mapView);
-
-            //==PAN THE VIEW
-            if(sf::Mouse::isButtonPressed(sf::Mouse::Middle)){
-              sf::Vector2f newCenter=-(currentMousePos-oldMousePos)+oldMapViewCenter;
-
-              sf::Vector2i tmpMousePos=window.mapCoordsToPixel(oldMousePos, mapView);
-              mapView.setCenter(newCenter);
-              oldMousePos=window.mapPixelToCoords(tmpMousePos, mapView);
-            
-            
-              break;
-            }
-
-            //==MOVE BOXES
-            if(sf::Mouse::isButtonPressed(sf::Mouse::Left)){
-              
-              for(auto selectedNode : selectedNodes){
-
-                int newX=currentMousePos.x-oldMousePos.x+static_cast<Box*>(selectedNode)->prevXCoordinate;
-                int newY=currentMousePos.y-oldMousePos.y+static_cast<Box*>(selectedNode)->prevYCoordinate;
-                
-                selectedNode->setX(newX);
-                selectedNode->setY(newY);
-
-                //update the link positions
-                for(auto node : nodes){
-                  //the links actually exist right? if so update them
-                  if(links[selectedNode][node]!=nullptr)
-                    static_cast<Connector*>(links[selectedNode][node])->updatePositions();
-                  if(links[node][selectedNode]!=nullptr)
-                    static_cast<Connector*>(links[node][selectedNode])->updatePositions();
-                }
-
-              
-              }
-
-              break;
-            }
-
-
-            //==CUT LINKS
-            if(cuttingLinks==true){
-              if(sf::Mouse::isButtonPressed(sf::Mouse::Right)){
-
-                window.setView(mapView);
-                sf::Vertex line[2];
-
-                float x, y;
-                sf::Vector2f difference=oldMousePos-currentMousePos;
-              
-                line[0]=sf::Vertex(oldMousePos+difference);
-                line[1]=sf::Vertex(currentMousePos-difference);
-              
-              
-                window.draw(line, 2, sf::Lines);
-                // window.display();
-
-                for(auto& row : links) {
-                  auto& linksRow=row.second;
-                  auto x=row.first;
-                  for(auto& link : linksRow) {
-                    auto y=link.first;
-
-                    if(links[x][y]==nullptr)
-                      continue;
-
-                    //do we slash the link in 2?
-                    if(doesItIntersect(currentMousePos, oldMousePos, static_cast<Connector*>(links[x][y])->getStart(), static_cast<Connector*>(links[x][y])->getEnd())){
-        
-                      std::cout << "Cutting Link!\n" << std::flush;
-                      delete links[x][y];
-                      links[x][y]=nullptr;
-                      break;
-                    }
-
-                  }
-                }
-              }
-            //==WE ARE ABOUT TO MAKE A LINK
-            }else{
-
-
-              //main selected excluded beacuse thats how the single selection works as well as node linking
-              HoveredNode=hoveringOverNotSelectedMain(currentMousePos.x, currentMousePos.y);
-            }
-
-
-          
-            //==RESIZE BOXES
-            if(sf::Mouse::isButtonPressed(sf::Mouse::Right)){
-
-              //we have a main node selected and we are in editing mode, right?
-              if(!(selectedMainNode==nullptr || editingText==false)){;
-           
-                int newWidth=currentMousePos.x-selectedMainNode->getX();
-                int newHeight=currentMousePos.y-selectedMainNode->getY();
-
-                selectedMainNode->setW(newWidth);
-                selectedMainNode->setH(newHeight);
-
-                //update the link positions
-                for(auto node : nodes){
-                  //the links actually exist right? if so update them
-                  if(links[selectedMainNode][node]!=nullptr)
-                    static_cast<Connector*>(links[selectedMainNode][node])->updatePositions();
-                  if(links[node][selectedMainNode]!=nullptr)
-                    static_cast<Connector*>(links[node][selectedMainNode])->updatePositions();
-                }
-              }
-            }
-
-
-            //update old positions
-          
-            oldMousePos=currentMousePos;
-            oldMapViewCenter=mapView.getCenter();
-            for(auto node : nodes){
-              static_cast<Box*>(node)->updatePreviousCoordinates();
-            }
-
-          
-
-                       
-          break;
-        }
-    }
-
 
     window.setView(mapView);
 
@@ -428,27 +164,374 @@ void MainGUIClass::startProgram(){
 
 }
 
-void MainGUIClass::performTerminalActions(void* voidWindow){
+void MainGUIClass::performTerminalActions(){
 
-  //cast to a window, derefrence and then take the refrence of that
-  sf::RenderWindow& window=*static_cast<sf::RenderWindow*>(voidWindow);
+  sf::Event event;
+  while (window.pollEvent(event)){
+      switch(event.type){
+        case sf::Event::Closed:
+          window.close();
+          break;
+        case sf::Event::Resized:
+          //if screen is resized mix the views dimensions
+          {
+            int windowWidth=event.size.width;
+            int windowHeight=event.size.height;
+            mapView.reset(sf::FloatRect(0.f, 0.f, windowWidth, windowHeight));
+            UIView.reset(sf::FloatRect(0.f, 0.f, windowWidth, windowHeight));
+          }
+          break;
+        case sf::Event::TextEntered:
+          performTerminalModeInput(event.text.unicode);
+          break;
+    }
+  }
+
+  sf::Text terminalText;
+
+  terminalText.setCharacterSize(15);
+  terminalText.setFont(TheFontWeAreUsing);
+  terminalText.setFillColor(sf::Color::White);
+  terminalText.setPosition(UIView.getCenter().x-UIView.getSize().x/2, UIView.getCenter().y+UIView.getSize().y/2-20);
+
+  std::string terminalString=":";
+  
+  auto command=terminal.returnCurrentCommand();
+
+  for(auto argument : command){
+    terminalString+=argument;
+    terminalString+=" ";
+  }
+  terminalString.pop_back();
+  
+  sf::Time time=clock.getElapsedTime();
+
+
+  if(time.asSeconds()<0.5){
+    terminalString+="|";
+  }else if(time.asSeconds()>1){
+      clock.restart();
+  }
+
+  terminalText.setString(terminalString);
+  
+  window.setView(UIView);
+  
+  window.draw(terminalText);
+  
 
 
 }
-void MainGUIClass::performUIAction(void* voidWindow){
 
-  //cast to a window, derefrence and then take the refrence of that
-  sf::RenderWindow& window=*static_cast<sf::RenderWindow*>(voidWindow);
+void MainGUIClass::performTerminalModeInput(uint32_t in){
+
+  //the ESC key or 27 ascii | we are haulting the terminal here, exiting it without performing anything
+  if(in=='\x1b'){
+    terminalMode=false;
+    terminal.haultCommand();
+    return;
+  }
+
+  //newline or carriage return | we are done with the command and performing an action
+  if(in=='\r' || in=='\n'){
+    terminalMode=false;
+    terminal.endCommand();
+    performTerminalModeOutput();
+    return;
+  }
+
+  clock.restart();
+  
+  terminal.addCharacterToCurrentCommmand(in);
+
+
+}
+
+void MainGUIClass::performTerminalModeOutput(){
+  return;
+}
+
+
+void MainGUIClass::performUIAction(){
+
+  sf::Event event;
+  while(window.pollEvent(event)){
+
+      switch(event.type){
+        case sf::Event::Closed:
+          window.close();
+          break;
+   
+        case sf::Event::MouseWheelMoved:
+          //==ZOOM
+          {
+            double zoomAddition=1-1.0*event.mouseWheel.delta/10;
+            ZoomFactor*=zoomAddition;
+            mapView.zoom(zoomAddition);
+          }
+      
+          break;
+
+        case sf::Event::KeyPressed:
+       
+          //set up editing mode
+          if(event.key.code==sf::Keyboard::Enter && selectedMainNode!=nullptr){
+            if(editingText){
+              stopEditContentOfNode();
+            }else{
+              startEditContentOfNode();            
+            }
+          }
+
+          //we are diting text, dont take keys as command input
+          if(editingText==true)
+            break;
+
+          
+          manageSelection();
+
+          break;
+
+        case sf::Event::TextEntered:
+          if(editingText==true){
+            editContentOfNode(event.text.unicode);
+            std::cout << "editing!!!\n";
+          }else{
+            if(event.text.unicode==':'){
+              terminalMode=true;
+              terminal.startCommand();
+              return;
+            }
+          
+          }
+          break;
+        
+    
+    
+        case sf::Event::KeyReleased:
+      
+          //we are diting text, dont take keys as command input
+          if(editingText==true)
+            break;
+
+          if(event.key.code==sf::Keyboard::A && !sf::Keyboard::isKeyPressed(sf::Keyboard::LControl)){
+            sf::Vector2f pos=window.mapPixelToCoords(sf::Mouse::getPosition(window), mapView);
+            addNode(new Box((int)pos.x-50, (int)pos.y-25, 100, 50, TheFontWeAreUsing));
+          }else if(event.key.code==sf::Keyboard::D || event.key.code==sf::Keyboard::Delete || event.key.code==sf::Keyboard::Backspace){
+
+            while(!selectedNodes.empty())
+              removeNode(*selectedNodes.begin());
+        
+            // for(auto node : selectedNodes)
+            //   removeNode(node);
+         
+      
+          }
+      
+          break;
+        case sf::Event::MouseButtonPressed:
+
+          {
+            sf::Vector2f mousePos=window.mapPixelToCoords(sf::Mouse::getPosition(window), mapView);
+
+            //=Manage the selection
+            if(event.mouseButton.button==sf::Mouse::Left){
+              manageSelection(mousePos);
+            }
+      
+            if(event.mouseButton.button==sf::Mouse::Right){
+              selectedMainNode=hoveringOver(mousePos);
+            
+              if(selectedMainNode==nullptr){
+                //cutting links
+                cuttingLinks=true;
+              }else{
+                //creating links
+                cuttingLinks=false;
+                selectedNodes.insert(selectedMainNode);
+              }
+          
+            }
+          }
+                              
+          break;
+        case sf::Event::MouseButtonReleased:
+
+          if(event.mouseButton.button==sf::Mouse::Right){
+
+            cuttingLinks=false;
+        
+            sf::Vector2f mousePos=window.mapPixelToCoords(sf::Mouse::getPosition(window), mapView);
+
+            auto connectTo=hoveringOverNotSelectedMain(mousePos);
+
+            //we actually have nodes to connect right?
+            if(connectTo==nullptr) break;
+            if(selectedMainNode==nullptr) break;
+
+        
+            addLink(selectedMainNode, connectTo, new Connector(static_cast<Box*>(selectedMainNode), static_cast<Box*>(connectTo)));
+            selectedMainNode=nullptr;  
+          }
+
+
+        
+          break;
+        case sf::Event::Resized:
+          //if screen is resized mix the views dimensions
+          {
+            int windowWidth=event.size.width;
+            int windowHeight=event.size.height;
+            mapView.reset(sf::FloatRect(0.f, 0.f, windowWidth, windowHeight));
+            UIView.reset(sf::FloatRect(0.f, 0.f, windowWidth, windowHeight));
+          }
+      
+          break;
+        case sf::Event::MouseMoved:
+
+      
+          static sf::Vector2f oldMousePos=sf::Vector2f(0, 0);
+          static sf::Vector2f oldMapViewCenter=sf::Vector2f(0, 0);
+
+        
+          sf::Vector2f currentMousePos=window.mapPixelToCoords(sf::Mouse::getPosition(window), mapView);
+
+          //==PAN THE VIEW
+          if(sf::Mouse::isButtonPressed(sf::Mouse::Middle)){
+            sf::Vector2f newCenter=-(currentMousePos-oldMousePos)+oldMapViewCenter;
+
+            sf::Vector2i tmpMousePos=window.mapCoordsToPixel(oldMousePos, mapView);
+            mapView.setCenter(newCenter);
+            oldMousePos=window.mapPixelToCoords(tmpMousePos, mapView);
+        
+        
+            break;
+          }
+
+          //==MOVE BOXES
+          if(sf::Mouse::isButtonPressed(sf::Mouse::Left)){
+          
+            for(auto selectedNode : selectedNodes){
+
+              int newX=currentMousePos.x-oldMousePos.x+static_cast<Box*>(selectedNode)->prevXCoordinate;
+              int newY=currentMousePos.y-oldMousePos.y+static_cast<Box*>(selectedNode)->prevYCoordinate;
+            
+              selectedNode->setX(newX);
+              selectedNode->setY(newY);
+
+              //update the link positions
+              for(auto node : nodes){
+                //the links actually exist right? if so update them
+                if(links[selectedNode][node]!=nullptr)
+                  static_cast<Connector*>(links[selectedNode][node])->updatePositions();
+                if(links[node][selectedNode]!=nullptr)
+                  static_cast<Connector*>(links[node][selectedNode])->updatePositions();
+              }
+
+          
+            }
+
+            break;
+          }
+
+
+          //==CUT LINKS
+          if(cuttingLinks==true){
+            if(sf::Mouse::isButtonPressed(sf::Mouse::Right)){
+
+              window.setView(mapView);
+              sf::Vertex line[2];
+
+              float x, y;
+              sf::Vector2f difference=oldMousePos-currentMousePos;
+          
+              line[0]=sf::Vertex(oldMousePos+difference);
+              line[1]=sf::Vertex(currentMousePos-difference);
+          
+          
+              window.draw(line, 2, sf::Lines);
+              // window.display();
+
+              for(auto& row : links) {
+                auto& linksRow=row.second;
+                auto x=row.first;
+                for(auto& link : linksRow) {
+                  auto y=link.first;
+
+                  if(links[x][y]==nullptr)
+                    continue;
+
+                  //do we slash the link in 2?
+                  if(doesItIntersect(currentMousePos, oldMousePos, static_cast<Connector*>(links[x][y])->getStart(), static_cast<Connector*>(links[x][y])->getEnd())){
+    
+                    std::cout << "Cutting Link!\n" << std::flush;
+                    delete links[x][y];
+                    links[x][y]=nullptr;
+                    break;
+                  }
+
+                }
+              }
+            }
+          //==WE ARE ABOUT TO MAKE A LINK
+          }else{
+
+
+            //main selected excluded beacuse thats how the single selection works as well as node linking
+            HoveredNode=hoveringOverNotSelectedMain(currentMousePos);
+          }
+
+
+      
+          //==RESIZE BOXES
+          if(sf::Mouse::isButtonPressed(sf::Mouse::Right)){
+
+            //we have a main node selected and we are in editing mode, right?
+            if(!(selectedMainNode==nullptr || editingText==false)){;
+       
+              int newWidth=currentMousePos.x-selectedMainNode->getX();
+              int newHeight=currentMousePos.y-selectedMainNode->getY();
+
+              selectedMainNode->setW(newWidth);
+              selectedMainNode->setH(newHeight);
+
+              //update the link positions
+              for(auto node : nodes){
+                //the links actually exist right? if so update them
+                if(links[selectedMainNode][node]!=nullptr)
+                  static_cast<Connector*>(links[selectedMainNode][node])->updatePositions();
+                if(links[node][selectedMainNode]!=nullptr)
+                  static_cast<Connector*>(links[node][selectedMainNode])->updatePositions();
+              }
+            }
+          }
+
+
+          //update old positions
+      
+          oldMousePos=currentMousePos;
+          oldMapViewCenter=mapView.getCenter();
+          for(auto node : nodes){
+            static_cast<Box*>(node)->updatePreviousCoordinates();
+          }
+
+      
+
+                   
+        break;
+      }
+  }
+
 
 }
 
 
 
-void MainGUIClass::manageSelection(float mouseX, float mouseY){
+void MainGUIClass::manageSelection(sf::Vector2f mousePos){
 
 
   //the node we will be working with
-  auto node=hoveringOver(mouseX, mouseY);
+  auto node=hoveringOver(mousePos);
 
 
   
@@ -500,7 +583,7 @@ void MainGUIClass::manageSelection(float mouseX, float mouseY){
     }
 
 
-    node=hoveringOverNotSelectedMain(mouseX, mouseY);
+    node=hoveringOverNotSelectedMain(mousePos);
 
     
     std::cout << "single selection\n";
@@ -523,7 +606,7 @@ void MainGUIClass::manageSelection(float mouseX, float mouseY){
     selectedNodes.insert(node);
     
     // update the hovering accordingly
-    HoveredNode=hoveringOverNotSelectedMain(mouseX, mouseY);
+    HoveredNode=hoveringOverNotSelectedMain(mousePos);
     
     return;
   }
@@ -589,41 +672,41 @@ void MainGUIClass::stopEditContentOfNode(){
   selectedMainNode->setContent(content);
 }
 
-Node* MainGUIClass::hoveringOver(float mouseX, float mouseY){
+Node* MainGUIClass::hoveringOver(sf::Vector2f mousePos){
       for(auto node : nodes)
-        if(node->collidingWithCoords(mouseX, mouseY))
+        if(node->collidingWithCoords(mousePos.x, mousePos.y))
           return node;
 
   return nullptr;
 }
-Node* MainGUIClass::hoveringOverSelected(float mouseX, float mouseY){
+Node* MainGUIClass::hoveringOverSelected(sf::Vector2f mousePos){
       for(auto node : selectedNodes)
-        if(node->collidingWithCoords(mouseX, mouseY))
+        if(node->collidingWithCoords(mousePos.x, mousePos.y))
           return node;
 
   return nullptr;
 }
-Node* MainGUIClass::hoveringOverNotSelectedMain(float mouseX, float mouseY){
+Node* MainGUIClass::hoveringOverNotSelectedMain(sf::Vector2f mousePos){
       for(auto node : nodes){
     
         //is it the main selected node? skip it if so
         if(node==selectedMainNode)
           continue;
     
-        if(node->collidingWithCoords(mouseX, mouseY))
+        if(node->collidingWithCoords(mousePos.x, mousePos.y))
           return node;
       }
 
   return nullptr;
 }
-Node* MainGUIClass::hoveringOverNotSelected(float mouseX, float mouseY){
+Node* MainGUIClass::hoveringOverNotSelected(sf::Vector2f mousePos){
       for(auto node : nodes){
 
         //is it selected? skip it if so
         if(selectedNodes.find(node)!=selectedNodes.end())
           continue;
     
-        if(node->collidingWithCoords(mouseX, mouseY))
+        if(node->collidingWithCoords(mousePos.x, mousePos.y))
           return node;
       }
 
@@ -720,3 +803,5 @@ bool doesItIntersect(sf::Vector2f pointA1, sf::Vector2f pointA2, sf::Vector2f po
     return true;
 
 }
+
+
