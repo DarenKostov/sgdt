@@ -21,6 +21,10 @@ class Terminal{
     std::vector<std::string> currentCommand;
     int currentArgument;
     bool enteringCommand;
+
+    //tells us which of the history entries we have copied
+    int currentHistoryCommandCopy;
+
     
   public:
 
@@ -38,7 +42,8 @@ class Terminal{
     std::vector<std::string> returnCurrentCommandWithColor();
     std::vector<std::vector<std::string>> returnCommandHistory();
 
-    
+    void setHistoryCopy(int);
+    int getHistoryCopy();
 
     
 

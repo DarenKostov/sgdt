@@ -173,6 +173,7 @@ void MainGUIClass::startProgram(){
 void MainGUIClass::performTerminalActions(){
 
   sf::Event event;
+  bool breakEventWhile=false;
   while (window.pollEvent(event)){
       switch(event.type){
         case sf::Event::Closed:
@@ -187,26 +188,45 @@ void MainGUIClass::performTerminalActions(){
             UIView.reset(sf::FloatRect(0.f, 0.f, windowWidth, windowHeight));
           }
           break;
+        case sf::Event::KeyPressed:
+          if(event.key.code==sf::Keyboard::Up){
+            terminal.setHistoryCopy(terminal.getHistoryCopy()+1);
+
+          }else if(event.key.code==sf::Keyboard::Down){
+            terminal.setHistoryCopy(terminal.getHistoryCopy()-1);
+          }
+
+          break;
         case sf::Event::TextEntered:
           performTerminalModeInput(event.text.unicode);
           break;
     }
+
+    if(breakEventWhile==true)
+      break;
+    
   }
 
+  //=draw the current command
   sf::Text terminalText;
 
-  terminalText.setCharacterSize(15);
+  int charSize=15;
+  int textHeight=UIView.getCenter().y+UIView.getSize().y/2-charSize-5;
+    
+  terminalText.setCharacterSize(charSize);
   terminalText.setFont(TheFontWeAreUsing);
   terminalText.setFillColor(sf::Color::White);
-  terminalText.setPosition(UIView.getCenter().x-UIView.getSize().x/2, UIView.getCenter().y+UIView.getSize().y/2-20);
+  terminalText.setPosition(UIView.getCenter().x-UIView.getSize().x/2, textHeight);
 
   std::string terminalString=":";
-  
-  auto command=terminal.returnCurrentCommand();
 
-  for(auto argument : command){
-    terminalString+=argument;
-    terminalString+=" ";
+  {
+    auto command=terminal.returnCurrentCommand();
+
+    for(auto argument : command){
+      terminalString+=argument;
+      terminalString+=" ";
+    }
   }
   terminalString.pop_back();
   
@@ -224,6 +244,28 @@ void MainGUIClass::performTerminalActions(){
   window.setView(UIView);
   
   window.draw(terminalText);
+
+  //=draw the history
+  int i=0;
+  for(auto command : terminal.returnCommandHistory()){
+    terminalString="";
+    
+    if(i==terminal.getHistoryCopy())
+      terminalText.setFillColor(sf::Color::Red);
+    else
+      terminalText.setFillColor(sf::Color::White);
+      
+      
+    for(auto argument : command){
+      terminalString+=argument;
+      terminalString+=" ";
+    }
+    textHeight-=(charSize+5);
+    terminalText.setPosition(UIView.getCenter().x-UIView.getSize().x/2, textHeight);
+    terminalText.setString(terminalString);
+    window.draw(terminalText);
+    i++;
+  }
   
 
 
@@ -257,7 +299,7 @@ void MainGUIClass::performTerminalModeOutput(){
 
   std::string a;
   // a.cc
-  std::vector<std::string> command=terminal.returnCommandHistory().back();
+  std::vector<std::string> command=terminal.returnCommandHistory()[0];
 
 
 
@@ -391,6 +433,7 @@ void MainGUIClass::performTerminalModeOutput(){
 
 
 
+  startNotification("Unknown command \""+command[0]+"\".");
   
   return;
 }

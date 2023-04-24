@@ -9,11 +9,13 @@
 */
 
 #include "terminal.h"
+#include <iostream>
 
 
 Terminal::Terminal(){
   enteringCommand=false;
   currentArgument=0;
+  currentHistoryCommandCopy=-1;
 }
 Terminal::~Terminal(){
   
@@ -23,6 +25,7 @@ void Terminal::startCommand(){
   if(enteringCommand==true) return;
   
   currentArgument=0;
+  currentHistoryCommandCopy=-1;
   enteringCommand=true;
   currentCommand.push_back("");
 
@@ -31,9 +34,10 @@ void Terminal::endCommand(){
   if(enteringCommand==false) return;
   
   enteringCommand=false;
-  history.push_back(currentCommand);
+  history.insert(history.begin(), currentCommand);
   currentCommand.clear();
   currentArgument=0;
+  currentHistoryCommandCopy=-1;
 }
 
 
@@ -43,6 +47,7 @@ void Terminal::haultCommand(){
   enteringCommand=false;
   currentCommand.clear();
   currentArgument=0;
+  currentHistoryCommandCopy=-1;
 
 }
 
@@ -95,5 +100,39 @@ std::vector<std::string> Terminal::returnCurrentCommandWithColor(){
 
 std::vector<std::vector<std::string>> Terminal::returnCommandHistory(){
   return history;
+}
+
+int Terminal::getHistoryCopy(){
+  return currentHistoryCommandCopy;
+}
+
+
+void Terminal::setHistoryCopy(int in){
+  // std::cout << "===========\n";
+  // std::cout << "input: " << in << "\n";
+  // std::cout << "history size: " << history.size() << "\n";
+  // std::cout << "result with vars: " << (in<-1 || in>=static_cast<int>(history.size())) << "\n";
+  // std::cout << "result in<-1: " << (in<-1) << "\n";
+  // std::cout << "result in>=history.size(): " << (in>=history.size()) << "\n";
+  // std::cout << "hardcoded result: " << (-1<-1 || -1>=2) << "\n";
+  // std::cout << "hardcoded -1<-1: " << (-1<-1) << "\n";
+  // std::cout << "hardcoded -1>=2: " << (-1>=2) << "\n";
+
+  // std::cout << "history size: " << history.size() << "\n";
+
+  if(in<-1 || in>=static_cast<int>(history.size()))
+  // if(in<-1 || in>=history.size())
+    return;
+
+  currentHistoryCommandCopy=in;
+
+  std::cout << in << "==\n";
+  
+  if(in==-1){
+    currentCommand.clear();
+    currentCommand.push_back("");
+  }else{
+    currentCommand=history[in];
+  }
 }
 
