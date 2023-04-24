@@ -35,6 +35,7 @@ MainGUIClass::MainGUIClass(){
   selectedMainNode=nullptr;
   HoveredNode=nullptr;
 
+  pathToWorkingFile="";
 
   int mapX=12;  int mapY=12;
 
@@ -59,6 +60,10 @@ MainGUIClass::MainGUIClass(){
   ZoomFactor=1;
 
   //notification stuff
+  notification.setCharacterSize(15);
+  notification.setFont(TheFontWeAreUsing);
+  notification.setFillColor(sf::Color::White);
+  notification.setString("Program started!");
   
 }
 MainGUIClass::~MainGUIClass(){
@@ -253,16 +258,44 @@ void MainGUIClass::performTerminalModeOutput(){
   std::string a;
   // a.cc
   std::vector<std::string> command=terminal.returnCommandHistory().back();
-  
+
+
+  /*
+    0- success
+    1- failuare
+    2- where file? (file is unspecified)
+  */
+  int returnCode=9999;
+
+
+  //==WRITING
   if(command[0]=="w"){
-    if(command.size()==1){
-      if(pathToWorkingFile!=""){
-        saveToFile(pathToWorkingFile);
-      }else{
-        //unspecified file
-      }
+    if(command.size()!=1){
+      pathToWorkingFile=command[1];
     }
-    saveToFile(command[1]);
+      
+    if(pathToWorkingFile==""){
+      returnCode=2;
+    }else{
+      returnCode=saveToFile(pathToWorkingFile);
+    }
+
+    switch(returnCode){
+      case 0:
+        startNotification("File saved to "+pathToWorkingFile+".");
+        break;
+      case 1:
+        startNotification("An error occured, try again.");
+        break;
+      case 2:
+        startNotification("Unspecified file.");
+        break;
+    }
+    return;
+  }
+
+  //==QUIT
+  if(command[0]=="q"){
   }
   
   return;
@@ -537,6 +570,13 @@ void MainGUIClass::performUIAction(){
                    
         break;
       }
+  }
+
+  //update and draw notification at position
+  if(clock.getElapsedTime().asSeconds()<2){
+    notification.setPosition(UIView.getCenter().x-UIView.getSize().x/2, UIView.getCenter().y+UIView.getSize().y/2-20);
+    window.setView(UIView);
+    window.draw(notification);
   }
 
 
@@ -827,4 +867,8 @@ bool doesItIntersect(sf::Vector2f pointA1, sf::Vector2f pointA2, sf::Vector2f po
 
 }
 
-
+void MainGUIClass::startNotification(std::string in){
+  notification.setString(in);
+  clock.restart();
+  // notification.setPosition(UIView.getCenter().x-UIView.getSize().x/2, UIView.getCenter().y+UIView.getSize().y/2-20);
+}

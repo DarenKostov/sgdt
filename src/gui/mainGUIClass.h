@@ -111,5 +111,6 @@ class MainGUIClass : public MainClass{
     void stopEditContentOfNode();
     void startEditContentOfNode();
 
+    void startNotification(std::string);
 
 };
