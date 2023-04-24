@@ -29,6 +29,8 @@ class MainGUIClass : public MainClass{
 
     //tells us if we are in the process of cutting links
     bool cuttingLinks;
+
+    bool terminalMode;
     
   public:
 
@@ -61,17 +63,28 @@ class MainGUIClass : public MainClass{
 
     //whatever you are hovering over
     Node* hoveringOver(float, float);
-
     //whatever you are hovering as long as its not selected  
     Node* hoveringOverNotSelected(float, float);
-
     //whatever you are hovering as long as its not the main selected node  
-    Node* hoveringOverNotSelectedMain(float, float);
-  
+    Node* hoveringOverNotSelectedMain(float, float);  
     //whatever you are hovering as long as its selected  
     Node* hoveringOverSelected(float, float);
 
 
+
+
+    //edits the input in terminal mode
+    void performTerminalModeInput(uint32_t);
+    //performs actions depending on the output in terminal mode
+    void performTerminalModeOutput(uint32_t);
+
+
+    //these perform the actions of the terminal or UI
+    //give it a sf::RenderWindow, it uses void* because this file has to not include sfml
+    void performTerminalActions(void*);
+    void performUIAction(void*);
+
+    
     //manages editing the contest of the selected node
     void editContentOfNode(uint32_t);
     void stopEditContentOfNode();

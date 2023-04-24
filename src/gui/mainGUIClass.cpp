@@ -29,6 +29,11 @@ bool doesItIntersect(sf::Vector2f, sf::Vector2f, sf::Vector2f, sf::Vector2f);
 
 MainGUIClass::MainGUIClass(){
   editingText=false;
+  cuttingLinks=false;
+  terminalMode=false;
+
+  selectedMainNode=nullptr;
+  HoveredNode=nullptr;
 }
 MainGUIClass::~MainGUIClass(){
   std::cout << "GUI class deleting\n";
@@ -81,12 +86,22 @@ void MainGUIClass::startProgram(){
 
 
 
-  while (window.isOpen()){
+  while(window.isOpen()){
     sf::Event event;
     window.clear();
 
+    if(terminalMode==true){
+      while (window.pollEvent(event)){
+        if(event.type==sf::Event::TextEntered){
+
+          break;
+        }
+      }
+    continue;
+    }
+      
     
-    while (window.pollEvent(event)){
+    while(window.pollEvent(event)){
 
         switch(event.type){
           case sf::Event::Closed:
@@ -410,6 +425,20 @@ void MainGUIClass::startProgram(){
   }
             
 
+
+}
+
+void MainGUIClass::performTerminalActions(void* voidWindow){
+
+  //cast to a window, derefrence and then take the refrence of that
+  sf::RenderWindow& window=*static_cast<sf::RenderWindow*>(voidWindow);
+
+
+}
+void MainGUIClass::performUIAction(void* voidWindow){
+
+  //cast to a window, derefrence and then take the refrence of that
+  sf::RenderWindow& window=*static_cast<sf::RenderWindow*>(voidWindow);
 
 }
 

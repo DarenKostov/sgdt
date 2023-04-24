@@ -4,7 +4,7 @@
 CXX= g++
 CXXFLAGS= -std=c++17
 SFMLFLAGS= -lsfml-graphics -lsfml-window -lsfml-system
-OBJFILES= bin/main.o bin/licence.o bin/mainClass.o bin/mainCLIClass.o bin/node.o bin/link.o
+OBJFILES= bin/main.o bin/licence.o bin/mainClass.o bin/mainCLIClass.o bin/node.o bin/link.o  bin/terminal.o
 GUIOBJFILES= bin/mainGUIClass.o bin/box.o bin/connector.o
 TARGET= bin/sgdt
 
@@ -39,6 +39,11 @@ bin/mainClass.o: src/mainClass.cpp src/mainClass.h bin/node.o bin/link.o
 	@echo MAIN CLASS:
 	$(CXX) $(CXXFLAGS) src/mainClass.cpp -c -o bin/mainClass.o
 
+bin/terminal.o: src/terminal.cpp /
+	@echo MAIN CLASS:
+	$(CXX) $(CXXFLAGS) src/terminal.cpp -c -o bin/terminal.o
+
+
 
 # CLI
 bin/mainCLIClass.o: src/cli/mainCLIClass.cpp src/cli/mainCLIClass.h
@@ -60,7 +65,7 @@ bin/mainGUIClass.o: src/gui/mainGUIClass.cpp src/gui/mainGUIClass.h bin/box.o bi
 	@echo GUI:
 	$(CXX) $(CXXFLAGS) $(SFMLFLAGS) src/gui/mainGUIClass.cpp -c -o bin/mainGUIClass.o
 	
-bin/mainGUIClassRemoved.o: src/gui/mainGUIClassRemoved.cpp src/gui/mainGUIClass.h
+bin/mainGUIClassRemoved.o: src/gui/mainGUIClassRemoved.cpp src/gui/mainGUIClassRemoved.h
 	@echo REMOVE GUI:
 	$(CXX) $(CXXFLAGS) src/gui/mainGUIClassRemoved.cpp -c -o bin/mainGUIClassRemoved.o
 	

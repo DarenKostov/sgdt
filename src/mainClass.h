@@ -12,6 +12,7 @@
 
 #include "structures/node.h"
 #include "structures/link.h"
+#include "terminal.h"
 #include <vector>
 #include <set>
 #include <unordered_map>
@@ -22,7 +23,8 @@ class MainClass{
     //variables:
     std::set<Node*> nodes;
     std::unordered_map<Node*, std::unordered_map<Node*, Link*>> links;
-
+    Terminal terminal;
+    
   public:
 
     

@@ -3,14 +3,14 @@
 
   Licence GPLv3
   
-  the MainGUIClass logic
+  the MainGUIClass logic, BUT without the GUI
 
 
 
 */
 
 
-#include "mainGUIClass.h"
+#include "mainGUIClassRemoved.h"
 #include <iostream>
 
 
@@ -27,13 +27,4 @@ void MainGUIClass::startProgram(){
   
 }
 
-void MainGUIClass::removeNode(Node*){}
-
-void MainGUIClass::manageSelection(float, float){}
-
-void MainGUIClass::manageSelection(){}
-
-void MainGUIClass::editContentOfNode(uint32_t){}
-void MainGUIClass::stopEditContentOfNode(){}
-void MainGUIClass::startEditContentOfNode(){}
 
