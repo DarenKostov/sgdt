@@ -58,7 +58,7 @@ MainGUIClass::MainGUIClass(){
   //how much have we zoomed (default is 1, aka we havent zoomed at all)
   ZoomFactor=1;
 
-
+  //notification stuff
   
 }
 MainGUIClass::~MainGUIClass(){
@@ -142,7 +142,8 @@ void MainGUIClass::startProgram(){
     }    
 
 
-
+    // if()
+    
     //draw ui
     window.setView(UIView);
     sf::Vector2i pos=sf::Mouse::getPosition(window);
@@ -248,6 +249,22 @@ void MainGUIClass::performTerminalModeInput(uint32_t in){
 }
 
 void MainGUIClass::performTerminalModeOutput(){
+
+  std::string a;
+  // a.cc
+  std::vector<std::string> command=terminal.returnCommandHistory().back();
+  
+  if(command[0]=="w"){
+    if(command.size()==1){
+      if(pathToWorkingFile!=""){
+        saveToFile(pathToWorkingFile);
+      }else{
+        //unspecified file
+      }
+    }
+    saveToFile(command[1]);
+  }
+  
   return;
 }
 
@@ -632,12 +649,17 @@ void MainGUIClass::manageSelection(){
 
 void MainGUIClass::editContentOfNode(sf::Uint32 in){
 
-  if (in<128){
+  if(in<128){
     //remove the ">"
     std::string content=selectedMainNode->getContent();
     if(content.size()!=0)
       content=content.substr(1, content.size());
 
+    //if newline or any other "newlines"
+    if(in=='\n' || in=='\r'){
+      return;
+    }
+    
     if(in==8){//if backspace
       content=content.substr(0, content.size()-1);
     }else{
@@ -659,6 +681,7 @@ void MainGUIClass::startEditContentOfNode(){
   std::string content=selectedMainNode->getContent();
   selectedMainNode->setContent(">"+content);
 }
+
 void MainGUIClass::stopEditContentOfNode(){
   if(!editingText) return;
   

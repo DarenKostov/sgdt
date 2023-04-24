@@ -9,6 +9,7 @@
 
 #include "node.h"
 #include <iostream>
+// #include <iostream>
 
 
 Node::Node(int x, int y, int w, int h){
@@ -18,6 +19,7 @@ Node::Node(int x, int y, int w, int h){
   Height=h;
   content="*New Text*";
 
+  id=rand();
 }
 
 Node::~Node(){
@@ -84,4 +86,11 @@ bool Node::collidingWithCoords(int x, int y){
   return false;
 }
 
+long Node::getId(){
+  return id;
+}
+
+void Node::changeId(long in){
+  id=in;
+}
 

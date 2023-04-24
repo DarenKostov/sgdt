@@ -12,10 +12,13 @@
 
 #include "mainClass.h"
 #include <iostream>
+#include <fstream>
 
 
 
 MainClass::MainClass(){
+
+  pathToWorkingFile="";
 }
 MainClass::~MainClass(){
     std::cout << "Main class deleting\n";
@@ -146,3 +149,65 @@ void MainClass::addLink(Node* from, Node* to, Link* in){
   links[from][to]=in;
 
 }
+
+
+int MainClass::saveToFile(std::string path){
+  std::fstream file;
+  
+  file.open(path, std::fstream::in | std::fstream::out | std::ios::trunc);
+  
+  if(!file.good()){
+   std::cout << "bad file!\n";
+   return 1;
+  }
+  std::cout << "good file\n";
+  
+  file << "# This is a sgdt file :/\n\n";
+
+
+  //==NODES
+  file << "# create [Id] [X coordinate] [Y coordinate] [Width] [Heigh] [Content]\n";
+
+  for(auto node : nodes){
+    file << "create " << node->getId();
+    file << " " << node->getX();
+    file << " " << node->getY();
+    file << " " << node->getW();
+    file << " " << node->getH();
+    file << " " << node->getContent();
+    file << "\n";
+  }
+
+
+  //==LINKS
+  file << "\n# link [Start id] [End id]\n";
+
+  for(auto& row : links) {
+    auto& linksRow=row.second;
+    auto x=row.first;
+    for(auto& link : linksRow) {
+      auto y=link.first;
+      if(links[x][y]==nullptr) continue;
+
+      file << "link " << x->getId();
+      file << " " << y->getId();
+      file << "\n";
+    }
+  }
+
+
+  file.close();
+  
+
+
+  return 0;  
+
+}
+
+int MainClass::loadFromFile(std::string path){
+
+
+  return 0;
+}
+
+

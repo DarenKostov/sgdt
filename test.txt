@@ -1,0 +1,9 @@
+# This is a sgdt file :/
+
+# create [Id] [X coordinate] [Y coordinate] [Width] [Heigh] [Content]
+create 1804289383 152 517 100 50 *New Text*
+create 846930886 94 259 100 50 dsndbjs
+create 1681692777 584 204 100 50 *New Text*
+create 1714636915 365 355 100 50 daskdbjsdb
+
+# link [Start id] [End id]

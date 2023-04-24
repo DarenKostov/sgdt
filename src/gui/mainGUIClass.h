@@ -32,6 +32,9 @@ class MainGUIClass : public MainClass{
 
     //tells us if we are in terminal mode or GUI mode
     bool terminalMode;
+  
+    //notification text, tells us what we did error messages, etc
+    sf::Text notification;
 
     //the window we will be drawwing on/using
     sf::RenderWindow window;

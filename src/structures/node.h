@@ -21,6 +21,10 @@ class Node{
     int Height;
     std::string content;
 
+    //used to identify this node
+    long id;
+
+    
   public:
 
 
@@ -51,6 +55,10 @@ class Node{
     //tells you weather or not the box is colliding with these coords
     bool collidingWithCoords(int, int);
 
+
+    //id stuff
+    long getId();
+    void changeId(long);
 
   
 };

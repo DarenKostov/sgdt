@@ -1,4 +1,4 @@
-/*
+ /*
   Daren Kostov
 
   a class that contains the main startup and loop
@@ -24,7 +24,10 @@ class MainClass{
     std::set<Node*> nodes;
     std::unordered_map<Node*, std::unordered_map<Node*, Link*>> links;
     Terminal terminal;
-    
+
+    //the path to the file we opened, are working with;
+    std::string pathToWorkingFile;
+  
   public:
 
     
@@ -43,7 +46,14 @@ class MainClass{
     virtual void addNode(Node*);
     virtual void removeNode(Node*);
     virtual void addLink(Node*, Node*, Link*);
-   // virtual void removeLink(Node*, Nodec);
+
+
+    //saves the data to a file
+    virtual int saveToFile(std::string);
+
+    //loads teh data from a file
+    virtual int loadFromFile(std::string);
+
   
 };
 
