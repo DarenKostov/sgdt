@@ -115,6 +115,10 @@ class MainGUIClass : public MainClass{
     //adds a Connector
     void addLink(Node*, Node*, Link*);
 
+
+    //removes every node (box) & link (connector)
+    void eraseEverything();
+
     
     //manages editing the contest of the selected node
     void editContentOfNode(uint32_t);

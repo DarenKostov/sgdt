@@ -26,11 +26,11 @@ MainClass::MainClass(){
 MainClass::~MainClass(){
   std::cout << "Main class deleting\n";
   
-  clearEverything();
+  eraseEverything();
   
 }
 
-void MainClass::clearEverything(){
+void MainClass::eraseEverything(){
   
     while(!nodes.empty()){
       std::cout << "Erasing node\n";
@@ -183,6 +183,7 @@ int MainClass::saveToFile(std::string path){
   }
   std::cout << "good file\n";
   
+  file << "# Simple Graphing File\n";
   file << "# This is a sgdt file :/\n";
   file << "# Don't edit, sgdt is not made to work with broken files\n\n";
 
@@ -245,7 +246,7 @@ int MainClass::loadFromFile(std::string path){
 
   pathToWorkingFile=path;
   
-  clearEverything();
+  eraseEverything();
     
   std::cout << "everything cleared\n";
 

@@ -39,7 +39,7 @@ bin/mainClass.o: src/mainClass.cpp src/mainClass.h bin/node.o bin/link.o
 	@echo MAIN CLASS:
 	$(CXX) $(CXXFLAGS) src/mainClass.cpp -c -o bin/mainClass.o
 
-bin/terminal.o: src/terminal.cpp /
+bin/terminal.o: src/terminal.cpp
 	@echo MAIN CLASS:
 	$(CXX) $(CXXFLAGS) src/terminal.cpp -c -o bin/terminal.o
 
@@ -61,7 +61,7 @@ bin/link.o: src/structures/link.cpp src/structures/link.h
 
 
 # # GUI
-bin/mainGUIClass.o: src/gui/mainGUIClass.cpp src/gui/mainGUIClass.h bin/box.o bin/connector.o
+bin/mainGUIClass.o: src/gui/mainGUIClass.cpp src/gui/mainGUIClass.h bin/box.o bin/connector.o src/mainClass.h
 	@echo GUI:
 	$(CXX) $(CXXFLAGS) $(SFMLFLAGS) src/gui/mainGUIClass.cpp -c -o bin/mainGUIClass.o
 	

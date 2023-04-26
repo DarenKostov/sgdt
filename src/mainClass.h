@@ -52,8 +52,9 @@ class MainClass{
     virtual void removeNode(Node*);
     virtual void addLink(Node*, Node*, Link*);
   
-    virtual void clearEverything();
-  
+    //removes every node (box) & link (connector)
+    virtual void eraseEverything();
+
     //gives you a new Node pointer
     virtual Node* giveMeNewNode();
   

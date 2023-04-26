@@ -93,13 +93,18 @@ Link* MainGUIClass::giveMeNewLink(){
 void MainGUIClass::addLink(Node* from, Node* to, Link* in){
   MainClass::addLink(from, to, in);
 
-  
-
-  
   //connect to the boxes/nodes 
   static_cast<Connector*>(in)->setStart((Box*)(from));
   static_cast<Connector*>(in)->setEnd((Box*)(to));
 }
+
+void MainGUIClass::eraseEverything(){
+  MainClass::eraseEverything();
+  selectedNodes.clear();
+  selectedMainNode=nullptr;
+  HoveredNode=nullptr;
+}
+
 
 int MainGUIClass::loadFromFile(std::string path){
 
@@ -312,6 +317,7 @@ void MainGUIClass::performTerminalModeInput(uint32_t in){
   if(in=='\x1b'){
     terminalMode=false;
     terminal.haultCommand();
+    startNotification("");
     return;
   }
 
@@ -1106,5 +1112,4 @@ bool doesItIntersect(sf::Vector2f pointA1, sf::Vector2f pointA2, sf::Vector2f po
 void MainGUIClass::startNotification(std::string in){
   notification.setString(in);
   clock.restart();
-  // notification.setPosition(UIView.getCenter().x-UIView.getSize().x/2, UIView.getCenter().y+UIView.getSize().y/2-20);
 }
