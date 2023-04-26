@@ -51,7 +51,10 @@ class MainGUIClass : public MainClass{
 
     //global clock
     sf::Clock clock;
-  
+
+    //types of notifications
+    enum notificationType {info, error, warning};
+
     
   public:
 
@@ -125,6 +128,9 @@ class MainGUIClass : public MainClass{
     void stopEditContentOfNode();
     void startEditContentOfNode();
 
+
+    //starts a notification :/
     void startNotification(std::string);
+    void startNotification(std::string, notificationType);
 
 };

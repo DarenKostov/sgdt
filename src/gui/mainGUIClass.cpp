@@ -64,6 +64,8 @@ MainGUIClass::MainGUIClass(){
   notification.setCharacterSize(15);
   notification.setFont(TheFontWeAreUsing);
   notification.setFillColor(sf::Color::White);
+  notification.setOutlineColor(sf::Color::Black);
+  notification.setOutlineThickness(2);
   notification.setString("Program started!");
   
 }
@@ -145,9 +147,7 @@ void MainGUIClass::startProgram(){
 
 
 
-    if(terminalMode==true){
-      performTerminalActions();
-    }else{
+    if(terminalMode==false){
       performUIAction();
     }
       
@@ -195,16 +195,23 @@ void MainGUIClass::startProgram(){
     //draw ui
     window.setView(UIView);
     sf::Vector2i pos=sf::Mouse::getPosition(window);
-    stats.setString(stats.getString()+std::to_string(pos.x)+" : "+std::to_string(pos.y)+"\n"
-      );
+    stats.setString(stats.getString()+std::to_string(pos.x)+" : "+std::to_string(pos.y)+"\n");
     window.draw(stats);
+
+
+    //perform after so that the terminal (and notification) displays on top of everything else
+    if(terminalMode==true){
+      performTerminalActions();
+    }else{
+      performUIAction();
+    }
+
 
 
     //display everything
     window.display();
 
     stats.setString("");
-
 
     
   }
@@ -259,7 +266,9 @@ void MainGUIClass::performTerminalActions(){
   terminalText.setCharacterSize(charSize);
   terminalText.setFont(TheFontWeAreUsing);
   terminalText.setFillColor(sf::Color::White);
-  terminalText.setPosition(UIView.getCenter().x-UIView.getSize().x/2, textHeight);
+  terminalText.setOutlineColor(sf::Color::Black);
+  terminalText.setOutlineThickness(2);
+  terminalText.setPosition(UIView.getCenter().x-UIView.getSize().x/2+5, textHeight);
 
   std::string terminalString=":";
 
@@ -304,7 +313,7 @@ void MainGUIClass::performTerminalActions(){
       terminalString+=" ";
     }
     textHeight-=(charSize+5);
-    terminalText.setPosition(UIView.getCenter().x-UIView.getSize().x/2, textHeight);
+    terminalText.setPosition(UIView.getCenter().x-UIView.getSize().x/2+5, textHeight);
     terminalText.setString(terminalString);
     window.draw(terminalText);
     i++;
@@ -368,13 +377,13 @@ void MainGUIClass::performTerminalModeOutput(){
 
     switch(returnCode){
       case 0:
-        startNotification("File saved to "+pathToWorkingFile+".");
+        startNotification("File saved to \n"+pathToWorkingFile+"\".", info);
         break;
       case 1:
-        startNotification("An error occured, try again.");
+        startNotification("An error occured, try again.", error);
         break;
       case 2:
-        startNotification("Unspecified file.");
+        startNotification("Unspecified file.", error);
         break;
     }
     return;
@@ -384,7 +393,7 @@ void MainGUIClass::performTerminalModeOutput(){
   if(command[0]=="q"){
     std::cout << (haveWeMadeAnyChanges? "True" : "False") << "\n";
     if(haveWeMadeAnyChanges==true){
-        startNotification("You have unsaved data. Run :q! to force quit.");
+        startNotification("You have unsaved data. Run :q! to force quit.", warning);
         return;
     }
     window.close();
@@ -419,14 +428,14 @@ void MainGUIClass::performTerminalModeOutput(){
 
     switch(returnCode){
       case 0:
-        startNotification("File saved to "+pathToWorkingFile+".");
+        startNotification("File saved to \""+pathToWorkingFile+"\".", info);
         window.close();
         break;
       case 1:
-        startNotification("An error occured, try again.");
+        startNotification("An error occured, try again.", error);
         break;
       case 2:
-        startNotification("Unspecified file.");
+        startNotification("Unspecified file.", error);
         break;
     }
     return;
@@ -460,14 +469,14 @@ void MainGUIClass::performTerminalModeOutput(){
 
     switch(returnCode){
       case 0:
-        startNotification("File saved to "+pathToWorkingFile+".");
+        startNotification("File saved to \""+pathToWorkingFile+"\".", info);
         window.close();
         break;
       case 1:
-        startNotification("An error occured, try again.");
+        startNotification("An error occured, try again.", error);
         break;
       case 2:
-        startNotification("Unspecified file.");
+        startNotification("Unspecified file.", error);
         break;
     }
     return;
@@ -477,12 +486,12 @@ void MainGUIClass::performTerminalModeOutput(){
   if(command[0]=="o"){
 
     if(haveWeMadeAnyChanges==true){
-      startNotification("You have unsaved data. Run :o! to force open a file.");
+      startNotification("You have unsaved data. Run :o! to force open a file.", warning);
       return;
     }
 
     if(command.size()==1){
-      startNotification("Unspecified file.");
+      startNotification("Unspecified file.",error);
       return;
     }
 
@@ -496,14 +505,14 @@ void MainGUIClass::performTerminalModeOutput(){
     
     switch(returnCode){
       case 0:
-        startNotification("Opened "+pathToWorkingFile+".");
+        startNotification("Opened \""+pathToWorkingFile+"\".", info);
         pathToWorkingFile=command[1];
         break;
       case 1:
-        startNotification("An error occured, try again.");
+        startNotification("An error occured, try again.", error);
         break;
       case 2:
-        startNotification("File was not found.");
+        startNotification("File was not found.", error);
         break;
     }
     return;
@@ -512,7 +521,7 @@ void MainGUIClass::performTerminalModeOutput(){
   if(command[0]=="o!"){
 
     if(command.size()==1){
-      startNotification("Unspecified file.");
+      startNotification("Unspecified file.", error);
       return;
     }
 
@@ -526,19 +535,19 @@ void MainGUIClass::performTerminalModeOutput(){
     
     switch(returnCode){
       case 0:
-        startNotification("Opened "+pathToWorkingFile+".");
+        startNotification("Opened \n"+pathToWorkingFile+"\".", info);
         pathToWorkingFile=command[1];
         break;
       case 1:
-        startNotification("An error occured, try again.");
+        startNotification("An error occured, try again.", error);
         break;
       case 2:
-        startNotification("File was not found.");
+        startNotification("File was not found.", error);
         break;
     }
     return;
   }
-  startNotification("Unknown command \""+command[0]+"\".");
+  startNotification("Unknown command \""+command[0]+"\".", error);
   
   return;
 }
@@ -819,7 +828,7 @@ void MainGUIClass::performUIAction(){
 
   //update and draw notification at position
   if(clock.getElapsedTime().asSeconds()<2){
-    notification.setPosition(UIView.getCenter().x-UIView.getSize().x/2, UIView.getCenter().y+UIView.getSize().y/2-20);
+    notification.setPosition(UIView.getCenter().x-UIView.getSize().x/2+5, UIView.getCenter().y+UIView.getSize().y/2-20);
     window.setView(UIView);
     window.draw(notification);
   }
@@ -1112,7 +1121,29 @@ bool doesItIntersect(sf::Vector2f pointA1, sf::Vector2f pointA2, sf::Vector2f po
 
 }
 
-void MainGUIClass::startNotification(std::string in){
+void MainGUIClass::startNotification(std::string in, notificationType type){
   notification.setString(in);
+  
+  switch(type){
+    case info:
+      notification.setFillColor(sf::Color::White);
+      break;
+    case error:
+      notification.setFillColor(sf::Color::Red);
+      break;
+    case warning:
+      notification.setFillColor(sf::Color::Yellow);
+      break;
+  }
+  
+  
   clock.restart();
+
+  
 }
+void MainGUIClass::startNotification(std::string in){
+  startNotification(in, info);
+}
+
+
+
