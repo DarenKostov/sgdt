@@ -51,12 +51,19 @@ class MainClass{
     virtual void addNode(Node*);
     virtual void removeNode(Node*);
     virtual void addLink(Node*, Node*, Link*);
-
+  
+    virtual void clearEverything();
+  
+    //gives you a new Node pointer
+    virtual Node* giveMeNewNode();
+  
+    //gives you a new Link pointer
+    virtual Link* giveMeNewLink();
 
     //saves the data to a file
     virtual int saveToFile(std::string);
 
-    //loads teh data from a file
+    //loads the data from a file
     virtual int loadFromFile(std::string);
 
   

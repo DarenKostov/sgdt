@@ -12,6 +12,7 @@
 
 #include "mainGUIClass.h"
 #include <iostream>
+#include <filesystem>
 #include <cmath>
 #include "../structures/box.h"
 #include "../structures/connector.h"
@@ -82,7 +83,41 @@ void MainGUIClass::removeNode(Node* in){
   MainClass::removeNode(in);
 }
 
+Node* MainGUIClass::giveMeNewNode(){
+  return new Box(0, 0, 0, 0, TheFontWeAreUsing);
+}
+Link* MainGUIClass::giveMeNewLink(){
+  return new Connector();
+}
 
+void MainGUIClass::addLink(Node* from, Node* to, Link* in){
+  MainClass::addLink(from, to, in);
+
+  
+
+  
+  //connect to the boxes/nodes 
+  static_cast<Connector*>(in)->setStart((Box*)(from));
+  static_cast<Connector*>(in)->setEnd((Box*)(to));
+}
+
+int MainGUIClass::loadFromFile(std::string path){
+
+  int returnCode=MainClass::loadFromFile(path);
+  
+  if(returnCode==1)
+    return 1;
+
+  editingText=false;
+  cuttingLinks=false;
+  terminalMode=false;
+
+  selectedMainNode=nullptr;
+  HoveredNode=nullptr;
+  
+  return returnCode;
+  
+}
 
 void MainGUIClass::startProgram(){
 
@@ -297,8 +332,6 @@ void MainGUIClass::performTerminalModeInput(uint32_t in){
 
 void MainGUIClass::performTerminalModeOutput(){
 
-  std::string a;
-  // a.cc
   std::vector<std::string> command=terminal.returnCommandHistory()[0];
 
 
@@ -431,8 +464,71 @@ void MainGUIClass::performTerminalModeOutput(){
     return;
   }
 
+  //==OPEN
+  if(command[0]=="o"){
 
+    if(haveWeMadeAnyChanges==true){
+      startNotification("You have unsaved data. Run :o! to force open a file.");
+      return;
+    }
 
+    if(command.size()==1){
+      startNotification("Unspecified file.");
+      return;
+    }
+
+    /*
+      0- success
+      1- failuare
+      2- where file? (file was not found)
+    */
+    
+    int returnCode=loadFromFile(command[1]);
+    
+    switch(returnCode){
+      case 0:
+        startNotification("Opened "+pathToWorkingFile+".");
+        pathToWorkingFile=command[1];
+        break;
+      case 1:
+        startNotification("An error occured, try again.");
+        break;
+      case 2:
+        startNotification("File was not found.");
+        break;
+    }
+    return;
+  }
+
+  if(command[0]=="o!"){
+
+    if(command.size()==1){
+      startNotification("Unspecified file.");
+      return;
+    }
+
+    /*
+      0- success
+      1- failuare
+      2- where file? (file was not found)
+    */
+    
+    int returnCode=loadFromFile(command[1]);
+    
+    switch(returnCode){
+      case 0:
+        startNotification("Opened "+pathToWorkingFile+".");
+        pathToWorkingFile=command[1];
+        break;
+      case 1:
+        startNotification("An error occured, try again.");
+        break;
+      case 2:
+        startNotification("File was not found.");
+        break;
+    }
+    return;
+  }
   startNotification("Unknown command \""+command[0]+"\".");
   
   return;

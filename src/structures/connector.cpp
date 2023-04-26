@@ -27,8 +27,15 @@ Connector::Connector(Box* start, Box* end){
   
   positioningMode=1;
   updatePositions();
-
 }
+
+Connector::Connector(){
+  pointStart=nullptr;
+  pointEnd=nullptr;
+  positioningMode=1;
+}
+
+
 Connector::~Connector(){}
 
 
@@ -39,6 +46,18 @@ sf::Vector2f Connector::getEnd(){
   return line[1].position;
 }
 
+void Connector::setStart(Box* in){
+  pointStart=in;
+
+  if(pointEnd!=nullptr)
+    updatePositions();
+}
+void Connector::setEnd(Box* in){
+  pointEnd=in;
+  
+  if(pointStart!=nullptr)
+    updatePositions();
+}
 
 void Connector::updatePositions(){
 

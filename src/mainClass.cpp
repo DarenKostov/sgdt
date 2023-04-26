@@ -12,7 +12,9 @@
 
 #include "mainClass.h"
 #include <iostream>
+#include <sstream>
 #include <fstream>
+#include <filesystem>
 
 
 
@@ -22,7 +24,13 @@ MainClass::MainClass(){
   haveWeMadeAnyChanges=false;
 }
 MainClass::~MainClass(){
-    std::cout << "Main class deleting\n";
+  std::cout << "Main class deleting\n";
+  
+  clearEverything();
+  
+}
+
+void MainClass::clearEverything(){
   
     while(!nodes.empty()){
       std::cout << "Erasing node\n";
@@ -33,7 +41,7 @@ MainClass::~MainClass(){
       auto& linksRow=row.second;
       for(auto& link : linksRow) {
 
-        if(link.second!=nullptr){//if statemtn not neccesery but fixes the amount of "Erasing link" messages
+        if(link.second!=nullptr){//if statement not neccesery but fixes the amount of "Erasing link" messages
           std::cout << "Erasing link\n";
           delete link.second;
         }
@@ -43,7 +51,6 @@ MainClass::~MainClass(){
     }
     links.clear();
 
-  
 }
 
 void MainClass::startProgram(){
@@ -51,6 +58,14 @@ void MainClass::startProgram(){
 }
 
 
+Node* MainClass::giveMeNewNode(){
+  return new Node(0, 0, 0, 0);
+}
+Link* MainClass::giveMeNewLink(){
+  return new Link();
+}
+
+  
 void MainClass::addNode(Node* in){
   haveWeMadeAnyChanges=true;
   nodes.insert(in);
@@ -88,7 +103,7 @@ void MainClass::addNode(Node* in){
   for(auto& row : links){
     links[in][row.first]=nullptr;
     /*^^^^^^
-        a b c w
+        // a b c w
       a = = = +
       b = = = +
       c = = = +
@@ -152,15 +167,15 @@ void MainClass::addLink(Node* from, Node* to, Link* in){
   std::cout << "creating link\n";
   
   links[from][to]=in;
-
+  
 }
 
 
 int MainClass::saveToFile(std::string path){
   haveWeMadeAnyChanges=false;
-  std::fstream file;
+  std::ofstream file;
   
-  file.open(path, std::fstream::in | std::fstream::out | std::ios::trunc);
+  file.open(path, std::fstream::out | std::ios::trunc);
   
   if(!file.good()){
    std::cout << "bad file!\n";
@@ -168,7 +183,8 @@ int MainClass::saveToFile(std::string path){
   }
   std::cout << "good file\n";
   
-  file << "# This is a sgdt file :/\n\n";
+  file << "# This is a sgdt file :/\n";
+  file << "# Don't edit, sgdt is not made to work with broken files\n\n";
 
 
   //==NODES
@@ -212,7 +228,112 @@ int MainClass::saveToFile(std::string path){
 
 int MainClass::loadFromFile(std::string path){
 
+  //make sure the file exists
+  if(std::filesystem::exists(path)==false){
+    return 2;
+  }
+  
+  std::ifstream file;
+  file.open(path, std::fstream::in);
 
+  
+  if(!file.good()){
+   std::cout << "bad file!\n";
+   return 1;
+  }
+  std::cout << "good file\n";
+
+  pathToWorkingFile=path;
+  
+  clearEverything();
+    
+  std::cout << "everything cleared\n";
+
+  std::string currentLine="";
+  
+  while(getline(file, currentLine, '\n')){
+
+    //ignore comments
+    if(currentLine[0]=='#' || (currentLine.size()>1 && currentLine[0]=='/' && currentLine[1]=='/')){
+      continue;
+    }
+
+    //get what comamnd it is
+    std::stringstream ss(currentLine);
+    std::string argument="";
+    Node* newNode=giveMeNewNode();
+      
+    getline(ss, argument, ' ');
+
+    if(argument=="create"){
+
+      int x, y, height, width;
+      long id;
+      std::string content;
+      
+      getline(ss, argument, ' ');
+      id=std::stol(argument);
+      
+      getline(ss, argument, ' ');
+      x=std::stoi(argument);
+      
+      getline(ss, argument, ' ');
+      y=std::stoi(argument);
+      
+      getline(ss, argument, ' ');
+      width=std::stoi(argument);
+      
+      getline(ss, argument, ' ');
+      height=std::stoi(argument);
+
+      getline(ss, argument);
+      content=argument;
+      
+      newNode->changeId(id);
+      newNode->setX(x);
+      newNode->setY(y);
+      newNode->setW(width);
+      newNode->setH(height);
+      newNode->setContent(content);
+      newNode->setContent(content);
+
+      addNode(newNode);
+      
+    }else if(argument=="link"){
+
+      long idStart, idEnd;
+      Link* newLink;
+      Node* startNode;
+      Node* endNode;
+      
+      getline(ss, argument, ' ');
+      idStart=std::stol(argument);
+      
+      getline(ss, argument, ' ');
+      idEnd=std::stol(argument);
+      
+      for(auto node : nodes){
+        
+        if(node->getId()==idStart)
+          startNode=node;
+        else if(node->getId()==idEnd)
+          endNode=node;
+      }
+
+      newLink=giveMeNewLink();
+
+      std::cout << "new link given!\n";
+      addLink(startNode, endNode, newLink);
+      std::cout << startNode->getContent() << " : " << endNode->getContent() << "\n";
+  
+      
+    }
+  
+  }
+  
+  haveWeMadeAnyChanges=false;
+  std::cout << "everything loaded\n";
+  
   return 0;
 }
 

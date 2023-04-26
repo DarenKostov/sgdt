@@ -92,7 +92,8 @@ class MainGUIClass : public MainClass{
     Node* hoveringOverSelected(sf::Vector2f);
 
 
-
+    //loads a file and replaces the current "workspace" with its contents
+    int loadFromFile(std::string);
 
     //edits the input in terminal mode
     void performTerminalModeInput(uint32_t);
@@ -104,6 +105,15 @@ class MainGUIClass : public MainClass{
     //give it a sf::RenderWindow, it uses void* because this file has to not include sfml
     void performTerminalActions();
     void performUIAction();
+
+    //gives you a new Box pointer
+    Node* giveMeNewNode();
+  
+    //gives you a new Connector pointer
+    Link* giveMeNewLink();
+
+    //adds a Connector
+    void addLink(Node*, Node*, Link*);
 
     
     //manages editing the contest of the selected node

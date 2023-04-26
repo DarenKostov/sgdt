@@ -39,8 +39,15 @@ class Connector : public Link{
     void updatePositionsClosest(sf::Vector2f&, sf::Vector2f&);
     
   public:
+
+    //constructir, give it the start & end points (Boxes)
     Connector(Box*, Box*);
+
+    //does nothing
     ~Connector();
+
+    //empty constructor DO NOT use unless needed, will give segfault if you touch it without initializing the start & end points
+    Connector();
 
     //getters
     // std::string getLabel();
@@ -52,6 +59,9 @@ class Connector : public Link{
 
     sf::Vector2f getStart();
     sf::Vector2f getEnd();
+  
+    void setStart(Box*);
+    void setEnd(Box*);
 
   
     void updatePositions();
