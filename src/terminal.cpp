@@ -15,7 +15,7 @@
 Terminal::Terminal(){
   enteringCommand=false;
   currentArgument=0;
-  currentHistoryCommandCopy=-1;
+  pointInHistory=-1;
 }
 Terminal::~Terminal(){
   
@@ -25,7 +25,7 @@ void Terminal::startCommand(){
   if(enteringCommand==true) return;
   
   currentArgument=0;
-  currentHistoryCommandCopy=-1;
+  pointInHistory=-1;
   enteringCommand=true;
   currentCommand.push_back("");
 
@@ -37,7 +37,12 @@ void Terminal::endCommand(){
   history.insert(history.begin(), currentCommand);
   currentCommand.clear();
   currentArgument=0;
-  currentHistoryCommandCopy=-1;
+  pointInHistory=-1;
+
+  if(history.size()>11){
+    history.erase(history.end()-1);
+  }
+  
 }
 
 
@@ -47,7 +52,7 @@ void Terminal::haultCommand(){
   enteringCommand=false;
   currentCommand.clear();
   currentArgument=0;
-  currentHistoryCommandCopy=-1;
+  pointInHistory=-1;
 
 }
 
@@ -94,6 +99,7 @@ std::vector<std::string> Terminal::returnCurrentCommand(){
   return currentCommand;
 }
 
+//TODO
 std::vector<std::string> Terminal::returnCurrentCommandWithColor(){
   return currentCommand;
 }
@@ -102,17 +108,17 @@ std::vector<std::vector<std::string>> Terminal::returnCommandHistory(){
   return history;
 }
 
-int Terminal::getHistoryCopy(){
-  return currentHistoryCommandCopy;
+int Terminal::getPointInHistory(){
+  return pointInHistory;
 }
 
 
-void Terminal::setHistoryCopy(int in){
+void Terminal::setPointInHistory(int in){
 
   if(in<-1 || in>=static_cast<int>(history.size()))
     return;
 
-  currentHistoryCommandCopy=in;
+  pointInHistory=in;
 
   std::cout << in << "==\n";
   
@@ -126,3 +132,6 @@ void Terminal::setHistoryCopy(int in){
   }
 }
 
+void Terminal::removeLatestHistoryEntry(){
+  history.erase(history.begin());
+}

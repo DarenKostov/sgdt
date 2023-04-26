@@ -230,10 +230,10 @@ void MainGUIClass::performTerminalActions(){
           break;
         case sf::Event::KeyPressed:
           if(event.key.code==sf::Keyboard::Up){
-            terminal.setHistoryCopy(terminal.getHistoryCopy()+1);
+            terminal.setPointInHistory(terminal.getPointInHistory()+1);
 
           }else if(event.key.code==sf::Keyboard::Down){
-            terminal.setHistoryCopy(terminal.getHistoryCopy()-1);
+            terminal.setPointInHistory(terminal.getPointInHistory()-1);
           }
 
           break;
@@ -290,7 +290,7 @@ void MainGUIClass::performTerminalActions(){
   for(auto command : terminal.returnCommandHistory()){
     terminalString="";
     
-    if(i==terminal.getHistoryCopy())
+    if(i==terminal.getPointInHistory())
       terminalText.setFillColor(sf::Color::Red);
     else
       terminalText.setFillColor(sf::Color::White);
