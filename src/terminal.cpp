@@ -108,20 +108,8 @@ int Terminal::getHistoryCopy(){
 
 
 void Terminal::setHistoryCopy(int in){
-  // std::cout << "===========\n";
-  // std::cout << "input: " << in << "\n";
-  // std::cout << "history size: " << history.size() << "\n";
-  // std::cout << "result with vars: " << (in<-1 || in>=static_cast<int>(history.size())) << "\n";
-  // std::cout << "result in<-1: " << (in<-1) << "\n";
-  // std::cout << "result in>=history.size(): " << (in>=history.size()) << "\n";
-  // std::cout << "hardcoded result: " << (-1<-1 || -1>=2) << "\n";
-  // std::cout << "hardcoded -1<-1: " << (-1<-1) << "\n";
-  // std::cout << "hardcoded -1>=2: " << (-1>=2) << "\n";
-
-  // std::cout << "history size: " << history.size() << "\n";
 
   if(in<-1 || in>=static_cast<int>(history.size()))
-  // if(in<-1 || in>=history.size())
     return;
 
   currentHistoryCommandCopy=in;
@@ -131,8 +119,10 @@ void Terminal::setHistoryCopy(int in){
   if(in==-1){
     currentCommand.clear();
     currentCommand.push_back("");
+    currentArgument=0;
   }else{
     currentCommand=history[in];
+    currentArgument=currentCommand.size()-1;
   }
 }
 
