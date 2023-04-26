@@ -77,9 +77,12 @@ void MainGUIClass::removeNode(Node* in){
 
   
   selectedNodes.erase(in);
+  
   if(selectedMainNode==in)
     selectedMainNode=nullptr;
-
+  if(in==HoveredNode)
+    HoveredNode=nullptr;
+  
   MainClass::removeNode(in);
 }
 
