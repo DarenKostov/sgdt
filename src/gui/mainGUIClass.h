@@ -26,6 +26,9 @@ class MainGUIClass : public MainClass{
 
     //tells us we are editing text
     bool editingText;
+  
+    //tells us we are editing text
+    bool editingColor;
 
     //tells us if we are in the process of cutting links
     bool cuttingLinks;
@@ -123,11 +126,15 @@ class MainGUIClass : public MainClass{
     void eraseEverything();
 
     
-    //manages editing the contest of the selected node
+    //manages editing the content of the selected node
     void editContentOfNode(uint32_t);
     void stopEditContentOfNode();
     void startEditContentOfNode();
 
+    //manages editing of the color of the selected node
+    void editColorOfNode(uint32_t);
+    void stopEditColorOfNode();
+    void startEditColorOfNode();
 
     //starts a notification :/
     void startNotification(std::string);

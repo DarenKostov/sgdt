@@ -20,6 +20,9 @@ class Node{
     int Width;
     int Height;
     std::string content;
+  
+    //color in hex
+    std::string color;
 
     //used to identify this node
     long id;
@@ -48,7 +51,11 @@ class Node{
     virtual void setH(int);
     virtual void move(int, int);
 
+    //manages color
+    std::string getColor();
+    virtual void setColor(std::string);
 
+    //manages content
     std::string getContent();
     virtual void setContent(std::string);
     

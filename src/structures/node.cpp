@@ -18,7 +18,7 @@ Node::Node(int x, int y, int w, int h){
   Width=w;
   Height=h;
   content="*New Text*";
-
+  color="ffffff";
   id=rand();
 }
 
@@ -59,10 +59,14 @@ void Node::move(int dx, int dy){
 }
 
 
+std::string Node::getColor(){
+  return color;
+}
+void Node::setColor(std::string in){
+  color=in;
+}
 
 std::string Node::getContent(){
-
-  
   return content;
 }
 void Node::setContent(std::string in){

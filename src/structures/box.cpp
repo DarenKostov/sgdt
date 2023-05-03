@@ -8,6 +8,7 @@
 */
 
 #include "box.h"
+#include <iostream>
 
 
 Box::Box(int x, int y, int w, int h, sf::Font& font): Node(x, y, w, h){
@@ -91,6 +92,27 @@ void Box::move(int dx, int dy){
 sf::RectangleShape Box::getBody(){
   return body;
 }
+
+void Box::setColor(std::string newColor){
+
+  if(newColor==""){
+    color=newColor;
+    body.setOutlineColor(sf::Color(0xffffffff));
+    return;
+  }
+  
+  try{
+    std::stoul(newColor, 0, 16);
+  }catch(const std::invalid_argument& ia){
+    std::cout << "invalid\n";
+    return;
+  }
+
+  color=newColor;
+  newColor+="ff";
+  body.setOutlineColor(sf::Color(std::stoul(newColor, 0, 16)));
+}
+
 
 sf::Text Box::getContentText(){
   return contentText;

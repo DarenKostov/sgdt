@@ -25,13 +25,17 @@ class Terminal{
     //tells where in the command history we are
     int pointInHistory;
 
+    //tells us where in the argument we are
+    int pointArguemnt;
+
     
   public:
 
     Terminal();
     ~Terminal();
 
-
+    //==KEYBOARD INPUT
+  
     //start new command
     void startCommand();
 
@@ -41,10 +45,19 @@ class Terminal{
     //end and discard current command
     void haultCommand();
 
-
     //adds a character to the current command (argument)  
     void addCharacterToCurrentCommmand(char);
 
+    //gors to the previous or next argument of the current command
+    void goToNextArgument();
+    void goToPreviousArgument();
+
+    //go to the next or prevous char in the current command (command)
+    void goToNextCharInCommand();
+    void goToPreviousCharInCommand();
+
+    //==MISC
+    
     //returns us the full current command
     std::vector<std::string> returnCurrentCommand();
 

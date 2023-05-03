@@ -26,7 +26,7 @@ nogui: $(OBJFILES) bin/mainGUIClassRemoved.o
 
 
 bin/main.o: src/main.cpp
-	@echo MAIN:
+	@echo MAIN CPP:
 	$(CXX) $(CXXFLAGS) src/main.cpp -c -o bin/main.o
 
 bin/licence.o: src/licence.cpp
@@ -40,14 +40,14 @@ bin/mainClass.o: src/mainClass.cpp src/mainClass.h bin/node.o bin/link.o
 	$(CXX) $(CXXFLAGS) src/mainClass.cpp -c -o bin/mainClass.o
 
 bin/terminal.o: src/terminal.cpp
-	@echo MAIN CLASS:
+	@echo TERMINAL CLASS:
 	$(CXX) $(CXXFLAGS) src/terminal.cpp -c -o bin/terminal.o
 
 
 
 # CLI
 bin/mainCLIClass.o: src/cli/mainCLIClass.cpp src/cli/mainCLIClass.h
-	@echo "CLI:"
+	@echo CLI:
 	$(CXX) $(CXXFLAGS) src/cli/mainCLIClass.cpp -c -o bin/mainCLIClass.o
 
 bin/node.o: src/structures/node.cpp src/structures/node.h

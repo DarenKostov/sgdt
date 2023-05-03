@@ -47,6 +47,10 @@ class Box : public Node, public GUIElement{
 
     sf::RectangleShape getBody();
 
+
+    //changes the color of the box border
+    void setColor(std::string);
+
     //manages the content
     sf::Text getContentText();
     void setContent(std::string);

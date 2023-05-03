@@ -173,7 +173,9 @@ void MainGUIClass::startProgram(){
 
     //==DRAW ACTUAL BODIES
     for(auto node : nodes){
-      static_cast<Box*>(node)->draw(window);
+      // static_cast<Box*>(node)->draw(window);
+      dynamic_cast<GUIElement*>(node)->draw(window);
+      // ((GUIElement*)(note))->draw(window);
     }
 
     //==DRAW LINKS
@@ -576,16 +578,24 @@ void MainGUIClass::performUIAction(){
         case sf::Event::KeyPressed:
        
           //set up editing mode
-          if(event.key.code==sf::Keyboard::Enter && selectedMainNode!=nullptr){
-            if(editingText){
-              stopEditContentOfNode();
-            }else{
-              startEditContentOfNode();            
+          if(selectedMainNode!=nullptr){
+            if(event.key.code==sf::Keyboard::Enter){
+              if(editingText || editingColor){//we are editing something
+                stopEditContentOfNode();
+                stopEditColorOfNode();
+              }else{//we aren editing anything
+                startEditContentOfNode();            
+              }
+            }else if(event.key.code==sf::Keyboard::R){
+              if(!editingColor && !editingText){//we aren editing anything
+                startEditColorOfNode();
+              }
             }
           }
 
-          //we are diting text, dont take keys as command input
-          if(editingText==true)
+        
+          //we are editing text, dont take keys as command input
+          if(editingText || editingColor)
             break;
 
           
@@ -597,6 +607,11 @@ void MainGUIClass::performUIAction(){
           if(editingText==true){
             editContentOfNode(event.text.unicode);
             std::cout << "editing!!!\n";
+          
+          }else if(editingColor==true){
+            editColorOfNode(event.text.unicode);
+            std::cout << "editing color!!!\n";
+          
           }else{
             if(event.text.unicode==':'){
               terminalMode=true;
@@ -612,7 +627,7 @@ void MainGUIClass::performUIAction(){
         case sf::Event::KeyReleased:
       
           //we are diting text, dont take keys as command input
-          if(editingText==true)
+          if(editingText || editingColor)
             break;
 
           if(event.key.code==sf::Keyboard::A && !sf::Keyboard::isKeyPressed(sf::Keyboard::LControl)){
@@ -940,6 +955,67 @@ void MainGUIClass::manageSelection(){
   }
 
 }
+
+
+
+void MainGUIClass::editColorOfNode(sf::Uint32 in){
+
+  if(in>=128) return;
+  if(!(in>='0' && in<='9')) return;
+  if(!(in>='a' && in<='f')) return;
+  
+  std::string color=selectedMainNode->getColor();
+
+  //if newline or any other "newlines"
+  if(in=='\n' || in=='\r'){
+    return;
+  }
+  
+  if(in==8){//if backspace
+    if(color.size()==1)
+      color="";
+    else
+      color=color.substr(0, color.size()-1);
+  }else{
+    color += static_cast<char>(in);
+  }
+
+  selectedMainNode->setColor(color);
+
+
+  std::string content=selectedMainNode->getContent();
+  auto pos=content.find('\n');
+  std::string contentOutput=content.substr(0, pos);
+  selectedMainNode->setContent(contentOutput+"\n"+selectedMainNode->getColor());
+  
+
+}
+void MainGUIClass::startEditColorOfNode(){
+  if(editingColor) return;
+  
+  std::cout << "starting to edit!\n";
+  editingColor=true;
+
+  selectedMainNode->setContent(selectedMainNode->getContent()+"\n"+selectedMainNode->getColor());
+  
+}
+
+// https://stackoverflow.com/questions/15006269/c-get-substring-before-a-certain-char
+void MainGUIClass::stopEditColorOfNode(){
+  if(!editingColor) return;
+  
+  std::cout << "stopping to edit color!\n";
+  editingColor=false;
+
+  std::string content=selectedMainNode->getContent();
+  auto pos=content.find('\n');
+  std::string contentOutput=content.substr(0, pos);
+  selectedMainNode->setContent(contentOutput);
+  
+  
+}
+
+
 
 void MainGUIClass::editContentOfNode(sf::Uint32 in){
 
