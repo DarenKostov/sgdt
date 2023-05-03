@@ -961,8 +961,6 @@ void MainGUIClass::manageSelection(){
 void MainGUIClass::editColorOfNode(sf::Uint32 in){
 
   if(in>=128) return;
-  if(!(in>='0' && in<='9')) return;
-  if(!(in>='a' && in<='f')) return;
   
   std::string color=selectedMainNode->getColor();
 
@@ -977,7 +975,9 @@ void MainGUIClass::editColorOfNode(sf::Uint32 in){
     else
       color=color.substr(0, color.size()-1);
   }else{
-    color += static_cast<char>(in);
+
+    if((in>='0' && in<='9') || (in>='a' && in<='f'))
+        color+=static_cast<char>(in);
   }
 
   selectedMainNode->setColor(color);

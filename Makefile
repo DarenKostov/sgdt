@@ -12,8 +12,8 @@ TARGET= bin/sgdt
 all: $(TARGET)
 
 
-	
-
+install: all
+	cp bin/sgdt /usr/bin/
 
 $(TARGET): $(OBJFILES) $(GUIOBJFILES)
 	@echo FINAL BINARY:
