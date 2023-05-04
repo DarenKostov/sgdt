@@ -36,7 +36,8 @@ Box::Box(int x, int y, int w, int h, sf::Font& font): Node(x, y, w, h){
   
 
   contentText.setString(content);
-  contentText.setCharacterSize(20);
+  contentText.setCharacterSize(15);
+  // contentText.setCharacterSize(20);
   contentText.setFont(font);
   contentText.setFillColor(sf::Color::White);
 

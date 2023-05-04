@@ -20,6 +20,7 @@
 
 void printLicence();
 void printHelp();
+void printVersion();
 
 
 
@@ -63,6 +64,8 @@ void signal_handler(int signal_num){
 
 int main(int argc, char **argv){
 
+  std::string fileToOpen="";
+
   bool useGUI=true;
 
   //read in flags
@@ -75,13 +78,14 @@ int main(int argc, char **argv){
       printHelp();
       return 0;
     }else if(thisArg=="-v" || thisArg=="--version"){
-
+      printVersion();
       return 0;
     }else if(thisArg=="-c" || thisArg=="--cli"){
       useGUI=false;
     }else if(thisArg=="-g" || thisArg=="--gui"){
       useGUI=true;
-
+    }else{
+      fileToOpen=thisArg;
     }
 
     
@@ -105,9 +109,14 @@ int main(int argc, char **argv){
 
   //set the function to be freed AFTER pointing it to memory
   atExitFree(mainInstance);
-  
+
+  //open the file if it was [resent in the arguments
+  if(fileToOpen!="")  
+    mainInstance->loadFromFile(fileToOpen);
+
   mainInstance->startProgram();
 
+  
 }
 
 //FUNCTION DEFINITION
@@ -123,3 +132,10 @@ void printHelp(){
 }
 
 
+void printVersion(){
+  std::cout << "Author: Daren Kostov\n";
+  std::cout << "SGDT- Simple Graphing/Diagramming Tool\n";
+  //Version Major.Minor.Patch
+  std::cout << "Version 0.1.0\n";
+
+}

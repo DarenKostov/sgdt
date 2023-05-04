@@ -189,7 +189,7 @@ int MainClass::saveToFile(std::string path){
 
 
   //==NODES
-  file << "# create [Id] [X coordinate] [Y coordinate] [Width] [Heigh] [Content]\n";
+  file << "# create [Id] [X coordinate] [Y coordinate] [Width] [Heigh] [Color] [Content]\n";
 
   for(auto node : nodes){
     file << "create " << node->getId();
@@ -197,6 +197,7 @@ int MainClass::saveToFile(std::string path){
     file << " " << node->getY();
     file << " " << node->getW();
     file << " " << node->getH();
+    file << " " << node->getColor();
     file << " " << node->getContent();
     file << "\n";
   }
@@ -270,7 +271,7 @@ int MainClass::loadFromFile(std::string path){
 
       int x, y, height, width;
       long id;
-      std::string content;
+      std::string content, color;
       
       getline(ss, argument, ' ');
       id=std::stol(argument);
@@ -286,6 +287,9 @@ int MainClass::loadFromFile(std::string path){
       
       getline(ss, argument, ' ');
       height=std::stoi(argument);
+      
+      getline(ss, argument, ' ');
+      color=argument;
 
       getline(ss, argument);
       content=argument;
@@ -295,6 +299,7 @@ int MainClass::loadFromFile(std::string path){
       newNode->setY(y);
       newNode->setW(width);
       newNode->setH(height);
+      newNode->setColor(color);
       newNode->setContent(content);
       newNode->setContent(content);
 

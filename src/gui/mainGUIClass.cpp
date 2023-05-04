@@ -54,7 +54,8 @@ MainGUIClass::MainGUIClass(){
 
 
   //load font
-  if(!TheFontWeAreUsing.loadFromFile("fonts/UbuntuMono-Regular.ttf"))
+  // if(!TheFontWeAreUsing.loadFromFile("/usr/local/share/fonts/UbuntuMono-Regular.ttf"))
+  if(!TheFontWeAreUsing.loadFromFile("/usr/share/fonts/liberation/LiberationMono-Regular.ttf"))
     std::cout << "fornt error\n";
 
   //how much have we zoomed (default is 1, aka we havent zoomed at all)
@@ -869,8 +870,10 @@ void MainGUIClass::manageSelection(sf::Vector2f mousePos){
       return;
 
       
-    if(selectedMainNode!=node)
+    if(selectedMainNode!=node){
       stopEditContentOfNode();
+      stopEditColorOfNode();
+    }
     
     selectedNodes.insert(static_cast<Box*>(node));
     selectedMainNode=static_cast<Box*>(node);
@@ -888,6 +891,7 @@ void MainGUIClass::manageSelection(sf::Vector2f mousePos){
     
     if(selectedMainNode==node){
       stopEditContentOfNode();
+      stopEditColorOfNode();
       selectedMainNode=nullptr;
     }
       
@@ -904,6 +908,7 @@ void MainGUIClass::manageSelection(sf::Vector2f mousePos){
     if(node==nullptr){
       selectedNodes.clear();
       stopEditContentOfNode();
+      stopEditColorOfNode();
       selectedMainNode=nullptr;;
       return;
     }
@@ -924,6 +929,7 @@ void MainGUIClass::manageSelection(sf::Vector2f mousePos){
 
     
     stopEditContentOfNode();
+    stopEditColorOfNode();
 
 
 
