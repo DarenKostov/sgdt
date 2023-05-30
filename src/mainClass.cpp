@@ -333,7 +333,14 @@ int MainClass::loadFromFile(std::string path){
       }
 
       newLink=giveMeNewLink();
-      newLink->setStyle(style);
+
+
+      //10 is some arbutrary number that is not too big
+      if((int)style>10)
+        newLink->setStyle(continuous);
+      else
+        newLink->setStyle(style);
+
       
       std::cout << "new link given!\n";
       addLink(startNode, endNode, newLink);
