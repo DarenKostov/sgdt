@@ -10,6 +10,7 @@
 
 
 #include "connector.h"
+#include <SFML/Graphics/PrimitiveType.hpp>
 
 #define _USE_MATH_DEFINES
 #include <cmath>
@@ -20,19 +21,27 @@ sf::Vector2f getIntersection(sf::Vector2f, sf::Vector2f, sf::Vector2f, sf::Vecto
 sf::Vector2f getIntersection(sf::Vector2f, sf::Vector2f, sf::Vector2f, sf::Vector2f);
 
 
-Connector::Connector(Box* start, Box* end){
+Connector::Connector(Box* start, Box* end, linkStyle connectorStyle){
   pointStart=start;
   pointEnd=end;
-
   
   positioningMode=1;
   updatePositions();
+  style=connectorStyle;
 }
 
 Connector::Connector(){
   pointStart=nullptr;
   pointEnd=nullptr;
   positioningMode=1;
+  style=continuous;
+}
+
+Connector::Connector(linkStyle connectorStyle){
+  pointStart=nullptr;
+  pointEnd=nullptr;
+  positioningMode=1;
+  style=connectorStyle;
 }
 
 
@@ -101,7 +110,40 @@ void Connector::updatePositions(){
 }
 
 void Connector::draw(sf::RenderWindow& window){
-  window.draw(line, 2, sf::Lines);
+
+  switch(style){
+    case continuous:
+      window.draw(line, 2, sf::Lines);
+      break;
+    case dashed:
+      // for(int i=0; i<10; i++){
+      // line[0].position
+      // window.draw(line, 2, sf::Lines);
+      // }
+      break;
+    case dotted:
+
+      //the dot
+      sf::RectangleShape dot;
+      dot.setSize(sf::Vector2f(3, 3));
+      dot.setFillColor(sf::Color::White);
+
+
+      //i hope sqrt is more expesive than this max/abs combination
+      int numberOfDots=(int)(fmax(std::abs(line[0].position.x-line[1].position.x), std::abs(line[0].position.y-line[1].position.y))/10);
+      
+      //draw all the dots
+      for(int i=0; i<numberOfDots; i++){
+        float gradient=((float)numberOfDots-i)/numberOfDots;
+        dot.setPosition(line[0].position.x*gradient+line[1].position.x*(1-gradient)-1,
+          line[0].position.y*gradient+line[1].position.y*(1-gradient)-1);
+        window.draw(dot);
+      }
+      break;
+  }
+
+
+  
   window.draw(arrow, 3, sf::LinesStrip);
 }
 

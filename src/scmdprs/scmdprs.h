@@ -15,7 +15,6 @@
 #ifndef SCMDPRS
 #define SCMDPRS
 
-#include <string>
 #include <vector>
 #include <iostream>
 

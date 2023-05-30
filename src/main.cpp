@@ -95,6 +95,8 @@ int main(int argc, char **argv){
   std::cout << "\e[93mstart of program\n\e[0m";
   signal(SIGINT, signal_handler);
 
+  int main;
+
 
 
 
@@ -106,7 +108,7 @@ int main(int argc, char **argv){
   }else{
     mainInstance=new MainCLIClass();
   }
-
+  main=0;
   //set the function to be freed AFTER pointing it to memory
   atExitFree(mainInstance);
 

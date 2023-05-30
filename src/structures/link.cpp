@@ -10,7 +10,9 @@
 #include "link.h"
 
 
-Link::Link(){}
+Link::Link(){
+  style=continuous;
+}
 Link::~Link(){}
 
 

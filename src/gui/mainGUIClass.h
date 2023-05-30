@@ -10,6 +10,7 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include <set>
+#include <stdint.h>
 
 class MainGUIClass : public MainClass{
 
@@ -51,7 +52,10 @@ class MainGUIClass : public MainClass{
 
     //how much have we zoomed
     double ZoomFactor=1;
-
+  
+    //the link style the next link will take
+    linkStyle nextLinkStyle;
+    
     //global clock
     sf::Clock clock;
 

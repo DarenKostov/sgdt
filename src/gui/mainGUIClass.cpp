@@ -11,6 +11,7 @@
 
 
 #include "mainGUIClass.h"
+#include <SFML/Window/Keyboard.hpp>
 #include <iostream>
 #include <filesystem>
 #include <cmath>
@@ -93,7 +94,7 @@ Node* MainGUIClass::giveMeNewNode(){
   return new Box(0, 0, 0, 0, TheFontWeAreUsing);
 }
 Link* MainGUIClass::giveMeNewLink(){
-  return new Connector();
+  return new Connector(nextLinkStyle);
 }
 
 void MainGUIClass::addLink(Node* from, Node* to, Link* in){
@@ -577,7 +578,22 @@ void MainGUIClass::performUIAction(){
           break;
 
         case sf::Event::KeyPressed:
-       
+
+
+          //manages the next link style
+          switch(event.key.code){
+            case sf::Keyboard::Num1:
+              nextLinkStyle=continuous;
+              break;
+            case sf::Keyboard::Num2:
+              nextLinkStyle=dashed;
+              break;
+            case sf::Keyboard::Num3:
+              nextLinkStyle=dotted;
+              break;
+          }
+
+         
           //set up editing mode
           if(selectedMainNode!=nullptr){
             if(event.key.code==sf::Keyboard::Enter){
@@ -687,7 +703,7 @@ void MainGUIClass::performUIAction(){
             if(selectedMainNode==nullptr) break;
 
         
-            addLink(selectedMainNode, connectTo, new Connector(static_cast<Box*>(selectedMainNode), static_cast<Box*>(connectTo)));
+            addLink(selectedMainNode, connectTo, new Connector(static_cast<Box*>(selectedMainNode), static_cast<Box*>(connectTo), nextLinkStyle));
             selectedMainNode=nullptr;  
           }
 

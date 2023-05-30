@@ -12,9 +12,15 @@
 #ifndef LINK
 #define LINK
 
+//link styles
+enum linkStyle {continuous, dashed, dotted};
+
+
 class Link{
   protected:
     std::string label;
+
+    linkStyle style;
   
     /*
     r-red

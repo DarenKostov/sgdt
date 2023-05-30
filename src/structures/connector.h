@@ -41,13 +41,14 @@ class Connector : public Link{
   public:
 
     //constructir, give it the start & end points (Boxes)
-    Connector(Box*, Box*);
+    Connector(Box*, Box*, linkStyle);
 
     //does nothing
     ~Connector();
 
     //empty constructor DO NOT use unless needed, will give segfault if you touch it without initializing the start & end points
     Connector();
+    Connector(linkStyle);
 
     //getters
     // std::string getLabel();
