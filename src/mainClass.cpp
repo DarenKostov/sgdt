@@ -204,7 +204,7 @@ int MainClass::saveToFile(std::string path){
 
 
   //==LINKS
-  file << "\n# link [Start id] [End id]\n";
+  file << "\n# link [Start id] [End id] [Style]\n";
 
   for(auto& row : links) {
     auto& linksRow=row.second;
@@ -215,6 +215,7 @@ int MainClass::saveToFile(std::string path){
 
       file << "link " << x->getId();
       file << " " << y->getId();
+      file << " " << (int)links[x][y]->getStyle();
       file << "\n";
     }
   }
@@ -311,6 +312,7 @@ int MainClass::loadFromFile(std::string path){
       Link* newLink;
       Node* startNode;
       Node* endNode;
+      linkStyle style;
       
       getline(ss, argument, ' ');
       idStart=std::stol(argument);
@@ -318,8 +320,12 @@ int MainClass::loadFromFile(std::string path){
       getline(ss, argument, ' ');
       idEnd=std::stol(argument);
       
+      getline(ss, argument, ' ');
+      style=(linkStyle)std::stoi(argument);
+
+
+      //find the nodes by id
       for(auto node : nodes){
-        
         if(node->getId()==idStart)
           startNode=node;
         else if(node->getId()==idEnd)
@@ -327,7 +333,8 @@ int MainClass::loadFromFile(std::string path){
       }
 
       newLink=giveMeNewLink();
-
+      newLink->setStyle(style);
+      
       std::cout << "new link given!\n";
       addLink(startNode, endNode, newLink);
       std::cout << startNode->getContent() << " : " << endNode->getContent() << "\n";

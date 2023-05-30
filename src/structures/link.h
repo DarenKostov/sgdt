@@ -44,10 +44,12 @@ class Link{
 
   //getters
   std::string getLabel();
+  linkStyle getStyle();
   char getColor();
   
   //setters
   void setLabel(std::string);
+  void setStyle(linkStyle);
   void setColor(char);
   
 
