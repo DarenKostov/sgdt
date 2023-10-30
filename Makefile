@@ -1,88 +1,51 @@
-
 # https://www.cs.colostate.edu/~cs157/LectureMakefile.pdf
 
 CXX= g++
 CXXFLAGS= -std=c++17
 SFMLFLAGS= -lsfml-graphics -lsfml-window -lsfml-system
-OBJFILES= bin/main.o bin/licence.o bin/mainClass.o bin/mainCLIClass.o bin/node.o bin/link.o  bin/terminal.o
-GUIOBJFILES= bin/mainGUIClass.o bin/box.o bin/connector.o
+OBJFILES= bin/main.o bin/licence.o bin/mainClass.o bin/mainDraw.o bin/mainUpdate.o bin/mainActions.o
 TARGET= bin/sgdt
 
 
 all: $(TARGET)
 
 
-install: all
-	cp bin/sgdt /usr/bin/
-
-$(TARGET): $(OBJFILES) $(GUIOBJFILES)
+$(TARGET): $(OBJFILES)
 	@echo FINAL BINARY:
-	$(CXX) $(CXXFLAGS) $(SFMLFLAGS) $(OBJFILES) $(GUIOBJFILES) -o $(TARGET)
+	$(CXX) $(CXXFLAGS) $(SFMLFLAGS) $(OBJFILES) -o $(TARGET)
 	
-nogui: $(OBJFILES) bin/mainGUIClassRemoved.o
-	@echo FINAL BINARY:
-	$(CXX) $(CXXFLAGS) $(OBJFILES) bin/mainGUIClassRemoved.o -o $(TARGET)
 
-
-
-bin/main.o: src/main.cpp
+bin/main.o: src/main.cxx src/mainClass.hxx
 	@echo MAIN CPP:
-	$(CXX) $(CXXFLAGS) src/main.cpp -c -o bin/main.o
+	$(CXX) $(CXXFLAGS) src/main.cxx -c -o bin/main.o
 
-bin/licence.o: src/licence.cpp
+bin/licence.o: src/licence.cxx
 	@echo LICENCE:
-	$(CXX) $(CXXFLAGS) src/licence.cpp -c -o bin/licence.o
+	$(CXX) $(CXXFLAGS) src/licence.cxx -c -o bin/licence.o
 	
-
-
-bin/mainClass.o: src/mainClass.cpp src/mainClass.h bin/node.o bin/link.o
+	
+bin/mainClass.o: src/mainClass.cxx src/mainClass.hxx
 	@echo MAIN CLASS:
-	$(CXX) $(CXXFLAGS) src/mainClass.cpp -c -o bin/mainClass.o
-
-bin/terminal.o: src/terminal.cpp
-	@echo TERMINAL CLASS:
-	$(CXX) $(CXXFLAGS) src/terminal.cpp -c -o bin/terminal.o
+	$(CXX) $(CXXFLAGS) src/mainClass.cxx -c -o bin/mainClass.o
 
 
-
-# CLI
-bin/mainCLIClass.o: src/cli/mainCLIClass.cpp src/cli/mainCLIClass.h
-	@echo CLI:
-	$(CXX) $(CXXFLAGS) src/cli/mainCLIClass.cpp -c -o bin/mainCLIClass.o
-
-bin/node.o: src/structures/node.cpp src/structures/node.h
-	@echo NODE:
-	$(CXX) $(CXXFLAGS) src/structures/node.cpp -c -o bin/node.o
+bin/mainDraw.o: src/mainDraw.cxx src/mainClass.hxx
+	@echo MAIN DRAW:
+	$(CXX) $(CXXFLAGS) src/mainDraw.cxx -c -o bin/mainDraw.o
 	
-bin/link.o: src/structures/link.cpp src/structures/link.h
-	@echo LINK:
-	$(CXX) $(CXXFLAGS) src/structures/link.cpp -c -o bin/link.o
+bin/mainUpdate.o: src/mainUpdate.cxx src/mainClass.hxx
+	@echo MAIN UPDATE:
+	$(CXX) $(CXXFLAGS) src/mainUpdate.cxx -c -o bin/mainUpdate.o
 
-
-
-# # GUI
-bin/mainGUIClass.o: src/gui/mainGUIClass.cpp src/gui/mainGUIClass.h bin/box.o bin/connector.o src/mainClass.h
-	@echo GUI:
-	$(CXX) $(CXXFLAGS) $(SFMLFLAGS) src/gui/mainGUIClass.cpp -c -o bin/mainGUIClass.o
+bin/mainActions.o: src/mainActions.cxx src/mainClass.hxx
+	@echo MAIN ACTIONS:
+	$(CXX) $(CXXFLAGS) src/mainActions.cxx -c -o bin/mainActions.o
 	
-bin/mainGUIClassRemoved.o: src/gui/mainGUIClassRemoved.cpp src/gui/mainGUIClassRemoved.h
-	@echo REMOVE GUI:
-	$(CXX) $(CXXFLAGS) src/gui/mainGUIClassRemoved.cpp -c -o bin/mainGUIClassRemoved.o
-	
-bin/box.o: src/structures/box.cpp src/structures/box.h src/structures/node.h src/structures/guiElement.h
-	@echo BOX:
-	$(CXX) $(CXXFLAGS) $(SFMLFLAGS) src/structures/box.cpp -c -o bin/box.o
-	
-bin/connector.o: src/structures/connector.cpp src/structures/connector.h src/structures/link.h src/structures/guiElement.h
-	@echo CONNECTOR:
-	$(CXX) $(CXXFLAGS) $(SFMLFLAGS) src/structures/connector.cpp -c -o bin/connector.o
-
-
 clean:
 	rm -f bin/*
 
 
 
-.PHONY: clean nogui all
+.PHONY: clean all
 
 
