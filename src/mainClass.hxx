@@ -16,13 +16,26 @@ If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include <SFML/Graphics.hpp>
+#include <set>
+#include <unordered_map>
+
+#include "elements/node.hxx"
+#include "elements/link.hxx"
+
 
 class MainClass{
 
   private:
-    //variables:
 
+    //store the graph
+    std::set<Node*> nodes;
+    std::unordered_map<Node*, std::unordered_map<Node*, Link*>> links;
 
+    //editor variables
+    std::string pathToWorkingFile;
+    bool haveWeMadeAnyChanges;
+  
+    
     //sfml stuff
     sf::RenderWindow window;
     sf::View mainView;
@@ -53,4 +66,50 @@ class MainClass{
     //this draws he program, like update but for drawing
     void draw();
 
+    //adds a node to the graph, you must provide the node in question
+    void addNode(Node*);
+
+    //removes a node from the graph, all links connected to it are severed
+    //deletes the object
+    void removeNode(Node*);
+
+    //makes a link between 2 nodes, you must provide the link in question
+    void addLink(Node*, Node*, Link*);
+    void linkNodes(Node*, Node*, Link*);
+
+    //removes a specific link
+    //deletes the object
+    void removeLink(Link*);
+
+    //deletes a link between 2 nodes (one way, not both)
+    //deletes the object
+    void severLink(Node*, Node*);
+
+    //gives you a new node pointer with the specific settings
+    Node* giveMeNewNodeBasedOnSettings();
+  
+    //gives you a new link pointer with the specific settings
+    Link* giveMeNewLinkBasedOnSettings();
+
+
+    //deletes every link and node, the graph should be empty after calling this method
+    void eraseEverythin();
+  
+    //saves the current graph in a file
+    bool saveToFile(std::string);
+
+    //loads a graph from a file
+    bool loadFromFile(std::string);
+
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
 };
