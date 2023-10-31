@@ -22,7 +22,7 @@ If not, see <https://www.gnu.org/licenses/>.
 
 
 MainClass::MainClass(){
-  window.create(sf::VideoMode(123, 123), "WXYZ");
+  window.create(sf::VideoMode(123, 123), "SGDT");
   mainView=sf::View(sf::FloatRect(0, 0, 123, 123));
   mainView.setViewport(sf::FloatRect(0, 0, 1, 1));
   window.setView(mainView);
