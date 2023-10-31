@@ -88,6 +88,9 @@ class Link{
   //sets the nodes the link is connecting
   void setConectees(std::pair<Node*, Node*>);
 
+  //gives you the maximim coordinates and the minimum coordinates (the 2 "corners" of the rectangle)
+  std::pair<sf::Vector2i, sf::Vector2i> getMaxAndMin();  
+
   //updates the positioons of the arrow (link) vased on where the conectees are
   void updatePositions();
 
@@ -127,6 +130,11 @@ class Link{
   sf::Color getHoveredColor();
 
 
+  //tels you if the coordinates (with 1x1 size) collide with the node
+  bool collidingWithCoords(sf::Vector2i);
+
+  
+  
   //draws the node, including its content
   void draw(sf::RenderWindow&);
 

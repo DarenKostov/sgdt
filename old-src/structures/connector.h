@@ -64,7 +64,9 @@ class Connector : public Link{
     void setStart(Box*);
     void setEnd(Box*);
 
-  
+    //tels you if the coordinates (with 1x1 size) collide with the link
+    bool collidingWithCoords(sf::Vector2i);
+
     void updatePositions();
 
     //draws itself on a RenderWindow
