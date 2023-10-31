@@ -42,7 +42,6 @@ class MainClass{
     sf::Clock clock;
 
     
-    
   public:
 
     //constructor, like a atSTartUp function
@@ -56,7 +55,8 @@ class MainClass{
 
   
     private:
-    
+    //==Base Methods
+
     //this performs tasks depending on the actions in the enviroment, like resizing the window 
     void performActions();
   
@@ -66,6 +66,9 @@ class MainClass{
     //this draws he program, like update but for drawing
     void draw();
 
+
+    //==Editor Related Methods
+        
     //adds a node to the graph, you must provide the node in question
     void addNode(Node*);
 
@@ -93,7 +96,7 @@ class MainClass{
 
 
     //deletes every link and node, the graph should be empty after calling this method
-    void eraseEverythin();
+    void eraseEverything();
   
     //saves the current graph in a file
     bool saveToFile(std::string);
