@@ -41,6 +41,22 @@ class MainClass{
     sf::View mainView;
     sf::Clock clock;
 
+    enum ErrorMessage {
+    success,
+    inputted_nullptr,
+    inputted_node_nullptr,
+    inputted_link_nullptr,
+    connecting_node_to_self,
+    rewriting_existing_link,
+    node_already_exists,
+    link_does_not_exist,
+    link_between_nodes_does_not_exist,
+    file_path_non_existant_or_unable_to_reach,
+    error_reading_from_file_path,
+    error_writing_to_file_path,
+    incorrect_sgdt_file_format,
+   
+    };
     
   public:
 
@@ -70,23 +86,23 @@ class MainClass{
     //==Editor Related Methods
         
     //adds a node to the graph, you must provide the node in question
-    void addNode(Node*);
+    ErrorMessage addNode(Node*);
 
     //removes a node from the graph, all links connected to it are severed
     //deletes the object
-    void removeNode(Node*);
+    ErrorMessage removeNode(Node*);
 
     //makes a link between 2 nodes, you must provide the link in question
-    void addLink(Node*, Node*, Link*);
-    void linkNodes(Node*, Node*, Link*);
+    ErrorMessage addLink(Node*, Node*, Link*);
+    ErrorMessage linkNodes(Node*, Node*, Link*);
 
     //removes a specific link
     //deletes the object
-    void removeLink(Link*);
+    ErrorMessage removeLink(Link*);
 
     //deletes a link between 2 nodes (one way, not both)
     //deletes the object
-    void severLink(Node*, Node*);
+    ErrorMessage severLink(Node*, Node*);
 
     //gives you a new node pointer with the specific settings
     Node* giveMeNewNodeBasedOnSettings();
@@ -96,13 +112,13 @@ class MainClass{
 
 
     //deletes every link and node, the graph should be empty after calling this method
-    void eraseEverything();
+    ErrorMessage eraseEverything();
   
     //saves the current graph in a file
-    bool saveToFile(std::string);
+    ErrorMessage saveToFile(std::string);
 
     //loads a graph from a file
-    bool loadFromFile(std::string);
+    ErrorMessage loadFromFile(std::string);
 
   
 
