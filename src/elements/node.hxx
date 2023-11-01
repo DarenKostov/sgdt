@@ -26,7 +26,7 @@ class Node{
     sf::Vector2i coordinates;
     sf::Vector2i dimensions;
 
-    std::string content;
+    sf::Text content;
   
     sf::Color fillColor;
     sf::Color outlineColor;
@@ -44,15 +44,41 @@ class Node{
     //variables for drawing purposes
     sf::RectangleShape body;
     sf::RectangleShape outerBody;
-
+    
+    int bodyThickness;
+    int outerbodyThickness;
+    
+    void updateContentProperties();
 
   public:
-  
+
+    //modes in which to draw the node
+    enum DrawingMode {normal, selected, highlighted, hovered};
+
+  private:
+
+    //the drawing mode of this particular node
+    DrawingMode drawingMode;
+
+  public:
+    
     //font, coordinates, size, contents, outline color
     Node(sf::Font&, sf::Vector2i, sf::Vector2i=sf::Vector2i(100, 50), std::string="new text");
 
     //deconstructor
     ~Node();
+
+    //sets the thickness of the main body outline
+    void setBodyThickness(int);    
+  
+    //gets the thickness of the main body outline
+    int getBodyThickness();    
+
+    //sets the thickness of the outer body outline
+    void setOuterBodyThickness(int);    
+  
+    //gets the thickness of the outer body outline
+    int getOuterBodyThickness();    
 
 
     //sets the coordinates of the node (x and y)
@@ -68,10 +94,10 @@ class Node{
     void resize(sf::Vector2i);
 
     //gets the coordinates of the node (x and y)
-    sf::Vector2i setCoordinates();
+    sf::Vector2i getCoordinates();
 
     //gets the dimensions of the node (width and height)
-    sf::Vector2i setDimensions();
+    sf::Vector2i getDimensions();
 
   
     //fill color, outline color, text color, selected color, highlighed color, hovered color
@@ -120,21 +146,17 @@ class Node{
     //modifies the text in the node
     void setContent(std::string);
 
+    //changes the drawing mode of the node
+    void changeDrawingMode(DrawingMode);
 
+    //gives you the drawing mode of the node
+    DrawingMode getDrawingMode();
+  
     //tels you if the coordinates (with 1x1 size) collide with the node
     bool collidingWithCoords(sf::Vector2i);
 
     //draws the node, including its content
     void draw(sf::RenderWindow&);
-
-    //draws the highlight of the text
-    void drawHighlight(sf::RenderWindow&);
-
-    //draws the select highlight
-    void drawSelect(sf::RenderWindow&);
-
-    //draws the hover highlight
-    void drawHover(sf::RenderWindow&);
 
 };
 
