@@ -46,7 +46,7 @@ class Node{
     sf::RectangleShape outerBody;
     
     int bodyThickness;
-    int outerbodyThickness;
+    int outerBodyThickness;
     
     void updateContentProperties();
 

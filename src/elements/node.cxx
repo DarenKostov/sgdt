@@ -16,17 +16,11 @@ If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include "node.hxx"
+#include <SFML/Graphics/Color.hpp>
+#include <SFML/System/Vector2.hpp>
+#include <SFML/Window/Keyboard.hpp>
 
 Node::Node(sf::Font& font, sf::Vector2f location, sf::Vector2f size, std::string text){
-
-  //==init colors
-  fillColor=sf::Color::Black;
-  outlineColor=sf::Color::White;
-  textColor=sf::Color::White;
-
-  selectColor=sf::Color(255, 162, 0, 255);
-  highlightColor=sf::Color(255, 66, 0, 255);
-  hoverColor=sf::Color(0, 162, 255, 255);
 
   //set up drawing mode
   changeDrawingMode(normal);
@@ -48,6 +42,18 @@ Node::Node(sf::Font& font, sf::Vector2f location, sf::Vector2f size, std::string
   content.setFillColor(textColor);
   updateContentProperties();
 
+  //==init colors
+  setColors(
+    sf::Color::Black,
+    sf::Color::White,
+    sf::Color::White,
+    sf::Color(255, 162, 0, 255),
+    sf::Color(255, 66, 0, 255),
+    sf::Color(0, 162, 255, 255)
+  );
+
+
+
   //set id
   id=objectCount;
   objectCount++;
@@ -55,6 +61,17 @@ Node::Node(sf::Font& font, sf::Vector2f location, sf::Vector2f size, std::string
 
 Node::~Node(){
   //do nothing for now
+}
+
+void Node::updateContentProperties(){
+  //center the origin of the text
+  auto properties=content.getLocalBounds();
+  content.setOrigin(properties.left+properties.width/2.0f, properties.top+properties.height/2.0f);
+
+  //center the text on the box
+  sf::Vector2f newPosition=coordinates+(dimensions/2.0f);
+  content.setPosition(newPosition);
+
 }
 
 void Node::setCoordinates(sf::Vector2f newCoordinates){
@@ -65,29 +82,160 @@ void Node::setCoordinates(sf::Vector2f newCoordinates){
   outerBody.setPosition(newCoordinates+sf::Vector2f(bodyThickness, bodyThickness));
 
   updateContentProperties();
-
-}
-
-void Node::updateContentProperties(){
-  //center the origin of the text
-  auto properties=content.getLocalBounds();
-  content.setOrigin(properties.left+properties.width/2.0f, properties.top+properties.height/2.0f);
-
-  //center the text on the box
-  sf::Vector2f newPosition=coordinates+(dimensions/2);
-  content.setPosition(newPosition);
-
 }
 
 
 
 
+void Node::setDimensions(sf::Vector2f newDimensions){
+  dimensions=newDimensions;
+  body.setSize(newDimensions);
+
+  //offset the outer body size by the outline thickness of the main body
+  outerBody.setSize(newDimensions-sf::Vector2f(bodyThickness*2, bodyThickness*2));
+
+  //update the positions
+  setCoordinates(coordinates);
+
+  updateContentProperties();
+}
+
+
+void Node::move(sf::Vector2f deltaCoordinates){
+  body.move(deltaCoordinates);
+  outerBody.move(deltaCoordinates);
+  coordinates+=deltaCoordinates;
+  updateContentProperties();
+}
+
+void Node::resize(sf::Vector2f deltaSizes){
+
+  setDimensions(dimensions+deltaSizes);  
+}
+
+sf::Vector2f Node::getCoordinates(){
+  return coordinates;
+}
+
+sf::Vector2f Node::getDimensions(){
+  return dimensions;
+}
 
 
 
 
 
+void Node::setBodyThickness(int in){
+  bodyThickness=in;
 
+  //update the positions
+  setCoordinates(coordinates);
+}
+
+void Node::setOuterBodyThickness(int in){
+  outerBodyThickness=in;
+
+  //update the positions
+  setCoordinates(coordinates);
+}
+
+int Node::getBodyThickness(){
+  return bodyThickness;
+}
+
+int Node::getOuterBodyThickness(){    
+  return outerBodyThickness;
+}
+
+
+
+//==handle colors
+
+void Node::setColors(sf::Color fill, sf::Color outline, sf::Color text, sf::Color selected, sf::Color highlight, sf::Color hover){
+
+  fillColor=fill;
+  outlineColor=outline;
+  textColor=text;
+
+  selectColor=selected;
+  highlightColor=highlight;
+  hoverColor=hover;
+  
+  //update the color of the main body
+  body.setFillColor(fillColor);
+  body.setOutlineColor(outlineColor);
+  content.setFillColor(textColor);
+  
+  //update the color of the outline body
+  changeDrawingMode(drawingMode);
+}
+
+
+void Node::setFillColor(sf::Color fill){
+  fillColor=fill;
+  body.setFillColor(fillColor);
+}
+
+void Node::setOutlineColor(sf::Color outline){
+  outlineColor=outline;
+  body.setOutlineColor(outlineColor);
+}
+
+void Node::setTextColor(sf::Color text){
+  textColor=text;
+  content.setFillColor(textColor);
+}
+
+void Node::setSelectedColor(sf::Color selected){
+  selectColor=selected;
+  changeDrawingMode(drawingMode);
+}
+
+void Node::setHighlightedColor(sf::Color highlight){
+  highlightColor=highlight;
+  changeDrawingMode(drawingMode);
+}
+
+void Node::setHoveredColor(sf::Color hover){
+  hoverColor=hover;
+  changeDrawingMode(drawingMode);
+}
+
+
+
+sf::Color Node::getFillColor(){
+  return fillColor;
+}
+
+sf::Color Node::getOutlineColor(){
+  return outlineColor;
+}
+
+sf::Color Node::getTextColor(){
+  return textColor;
+}
+
+sf::Color Node::getSelectedColor(){
+  return selectColor;
+}
+
+sf::Color Node::getHighlightedColor(){
+  return highlightColor;
+}
+
+sf::Color Node::getHoveredColor(){
+  return hoverColor;
+}
+
+
+std::string Node::getContent(){
+  return content.getString();
+}
+
+void Node::setContent(std::string newText){
+  content.setString(newText);
+  updateContentProperties();
+}
 
 
 void Node::changeDrawingMode(Node::DrawingMode mode){
