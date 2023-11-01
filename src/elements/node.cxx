@@ -17,7 +17,7 @@ If not, see <https://www.gnu.org/licenses/>.
 
 #include "node.hxx"
 
-Node::Node(sf::Font& font, sf::Vector2i location, sf::Vector2i size, std::string text){
+Node::Node(sf::Font& font, sf::Vector2f location, sf::Vector2f size, std::string text){
 
   //==init colors
   fillColor=sf::Color::Black;
@@ -57,12 +57,12 @@ Node::~Node(){
   //do nothing for now
 }
 
-void Node::setCoordinates(sf::Vector2i newCoordinates){
+void Node::setCoordinates(sf::Vector2f newCoordinates){
   coordinates=newCoordinates;
-  body.setPosition(static_cast<sf::Vector2f>(newCoordinates));
+  body.setPosition(newCoordinates);
 
   //offset the outer body by the outline thickness of the main body
-  outerBody.setPosition(static_cast<sf::Vector2f>(newCoordinates+sf::Vector2i(bodyThickness, bodyThickness)));
+  outerBody.setPosition(newCoordinates+sf::Vector2f(bodyThickness, bodyThickness));
 
   updateContentProperties();
 
@@ -74,8 +74,8 @@ void Node::updateContentProperties(){
   content.setOrigin(properties.left+properties.width/2.0f, properties.top+properties.height/2.0f);
 
   //center the text on the box
-  sf::Vector2i newPosition=coordinates+(dimensions/2);
-  content.setPosition(static_cast<sf::Vector2f>(newPosition));
+  sf::Vector2f newPosition=coordinates+(dimensions/2);
+  content.setPosition(newPosition);
 
 }
 

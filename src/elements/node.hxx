@@ -23,8 +23,8 @@ If not, see <https://www.gnu.org/licenses/>.
 
 class Node{
   private:
-    sf::Vector2i coordinates;
-    sf::Vector2i dimensions;
+    sf::Vector2f coordinates;
+    sf::Vector2f dimensions;
 
     sf::Text content;
   
@@ -63,7 +63,7 @@ class Node{
   public:
     
     //font, coordinates, size, contents, outline color
-    Node(sf::Font&, sf::Vector2i, sf::Vector2i=sf::Vector2i(100, 50), std::string="new text");
+    Node(sf::Font&, sf::Vector2f, sf::Vector2f=sf::Vector2f(100, 50), std::string="new text");
 
     //deconstructor
     ~Node();
@@ -82,22 +82,22 @@ class Node{
 
 
     //sets the coordinates of the node (x and y)
-    void setCoordinates(sf::Vector2i);
+    void setCoordinates(sf::Vector2f);
 
     //sets the dimensions of the node (width and height)
-    void setDimensions(sf::Vector2i);
+    void setDimensions(sf::Vector2f);
 
     //offsets the coordinates of the node (x and y)
-    void move(sf::Vector2i);
+    void move(sf::Vector2f);
 
     //resizes the dimensions of the node (width and height)
-    void resize(sf::Vector2i);
+    void resize(sf::Vector2f);
 
     //gets the coordinates of the node (x and y)
-    sf::Vector2i getCoordinates();
+    sf::Vector2f getCoordinates();
 
     //gets the dimensions of the node (width and height)
-    sf::Vector2i getDimensions();
+    sf::Vector2f getDimensions();
 
   
     //fill color, outline color, text color, selected color, highlighed color, hovered color
@@ -153,7 +153,7 @@ class Node{
     DrawingMode getDrawingMode();
   
     //tels you if the coordinates (with 1x1 size) collide with the node
-    bool collidingWithCoords(sf::Vector2i);
+    bool collidingWithCoords(sf::Vector2f);
 
     //draws the node, including its content
     void draw(sf::RenderWindow&);
