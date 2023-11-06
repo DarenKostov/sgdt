@@ -17,6 +17,7 @@ If not, see <https://www.gnu.org/licenses/>.
 
 #include "node.hxx"
 #include <SFML/Graphics/Color.hpp>
+#include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Window/Keyboard.hpp>
 
@@ -261,8 +262,28 @@ void Node::changeDrawingMode(Node::DrawingMode mode){
   
 }
 
+Node::DrawingMode Node::getDrawingMode(){
+  return drawingMode;
+}
+
+bool Node::collidingWithCoords(sf::Vector2f point){
+  
+  if(point.x>coordinates.x && point.x<coordinates.x+dimensions.x) //the point is within range on the x
+    if(point.y>coordinates.y && point.y<coordinates.y+dimensions.y) //the point is within range on the y
+      return true;
+  return false;
+}
+
+uint Node::getId(){
+  return id;
+}
 
 
+void Node::draw(sf::RenderWindow& window){
+  window.draw(body);
+  window.draw(outerBody);
+  window.draw(content);
+}
 
 
 

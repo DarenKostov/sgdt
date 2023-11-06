@@ -155,6 +155,9 @@ class Node{
     //tels you if the coordinates (with 1x1 size) collide with the node
     bool collidingWithCoords(sf::Vector2f);
 
+    //gives yuo the id of this node
+    uint getId();
+  
     //draws the node, including its content
     void draw(sf::RenderWindow&);
 
